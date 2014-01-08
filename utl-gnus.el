@@ -1,0 +1,134 @@
+;;; utl-gnus.el --- Additional functionality for Gnus
+
+;; Author: Alex Kost <alezost@gmail.com>
+;; Created: 30 Jul 2013
+
+;;; Code:
+
+(require 'gnus)
+(require 'utl-misc)  ; for utl-xor
+
+(defadvice smtpmail-via-smtp (around prompt-for-password)
+  "Prompt for password before sending.
+Look also at `auth-source-forget-all-cached' if you wrote the wrong password."
+  (let ((ask-for-password t))
+    ad-do-it))
+
+(defun utl-gnus-buffer-names ()
+  "Return a list of names of live gnus buffer."
+  (mapcar 'buffer-name (gnus-buffers)))
+
+(defun utl-gnus-buffer-p ()
+  "Return nil if current buffer is not a gnus buffer."
+  (memq (current-buffer) (gnus-buffers)))
+
+;;;###autoload
+(defun utl-gnus-switch-to-group-buffer ()
+  "Switch to gnus group buffer if it exists, otherwise start gnus."
+  (interactive)
+  (if (and (fboundp 'gnus-alive-p)
+           (gnus-alive-p))
+      (switch-to-buffer gnus-group-buffer)
+    (gnus)))
+
+;;;###autoload
+(defun utl-gnus-ido-switch-buffer ()
+  "Switch to gnus buffer, or start gnus if not already started.
+Gnus buffer is selected using IDO."
+  (interactive)
+  (let ((gnus-bufs (utl-gnus-buffer-names)))
+    (if gnus-bufs
+     	(switch-to-buffer (ido-completing-read "Gnus buffer: " gnus-bufs))
+      (gnus))))
+
+
+;;; Switching gnus and non-gnus window configurations
+;; idea from <http://www.emacswiki.org/emacs/SwitchToGnus>
+
+(defvar utl-gnus-win-config nil
+  "Window configuration of gnus buffers.")
+(defvar utl-non-gnus-win-config nil
+  "Window configuration of non-gnus buffers.")
+
+(defun utl-gnus-get-win-config-var (&optional revert)
+  "Return a name of variable with window configuration.
+If REVERT is nil:
+  if current buffer is a gnus buffer, return `utl-gnus-win-config',
+  otherwise return `utl-non-gnus-win-config'.
+If REVERT is non-nil, do vice versa."
+  ;; i like exquisiteness
+  (if (utl-xor (utl-gnus-buffer-p) revert)
+      'utl-gnus-win-config
+    'utl-non-gnus-win-config))
+
+(defun utl-gnus-save-win-config ()
+  "Save current gnus or non-gnus window configuration."
+  (interactive)
+  (set (utl-gnus-get-win-config-var)
+       (current-window-configuration)))
+
+;;;###autoload
+(defun utl-gnus-switch-win-config (&optional arg)
+  "Switch between gnus and non-gnus buffers, preserving window configurations.
+With ARG refresh window configuration and start gnus again."
+  (interactive "P")
+  (utl-gnus-save-win-config)
+  (if (and (gnus-alive-p)
+           (null arg))
+      (set-window-configuration (eval (utl-gnus-get-win-config-var 'other)))
+    (gnus)
+    (utl-gnus-save-win-config)))
+
+
+;;; Processing multimedia links with emms
+
+(defvar utl-gnus-mm-url-re "\\.mp3$"
+  "Regexp for multimedia links.
+Used in `utl-gnus-summary-get-mm-url'.")
+
+(defun utl-gnus-summary-emms-add-url ()
+  "Add the first multimedia link from gnus article to emms playlist."
+  (interactive)
+  (emms-add-url (utl-gnus-summary-get-mm-url)))
+
+(defun utl-gnus-summary-emms-play-url ()
+  "Play the first multimedia link from gnus article with emms."
+  (interactive)
+  (emms-play-url (utl-gnus-summary-get-mm-url)))
+
+(defun utl-gnus-summary-get-mm-url ()
+  "Return the first link to multimedia url from the gnus article.
+Matching url is defined by `utl-gnus-mm-url-re'."
+  (let ((article (gnus-summary-article-number)))
+    (or article
+        (error "No article to select"))
+    (gnus-configure-windows 'article)
+    ;; selected subject is different from current article's
+    (if (or (null gnus-current-article)
+	    (null gnus-article-current)
+	    (/= article (cdr gnus-article-current))
+	    (not (equal (car gnus-article-current) gnus-newsgroup-name)))
+        (gnus-summary-display-article article))
+    (gnus-eval-in-buffer-window gnus-article-buffer
+      (goto-char (point-min))
+      (utl-widget-find-url utl-gnus-mm-url-re))))
+
+(defun utl-widget-find-url (re)
+  "Return the first widget-url matching regexp RE from point.
+Return nil if no matches found."
+  (if (eobp)
+      nil
+    (if widget-use-overlay-change
+        (goto-char (next-overlay-change (point)))
+      (forward-char 1))
+    (if (widget-tabable-at)
+        (let ((url (get-text-property (point) 'shr-url)))
+          (if (and (stringp url)
+                   (string-match re url))
+              url
+            (utl-widget-find-url re)))
+      (utl-widget-find-url re))))
+
+(provide 'utl-gnus)
+
+;;; utl-gnus.el ends here
