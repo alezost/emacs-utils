@@ -6,6 +6,13 @@
 ;;; Code:
 
 ;;;###autoload
+(defun utl-ido-find-file (&optional dir)
+  "Similar to `ido-find-file', but start from DIR if it is non-nil."
+  (interactive)
+  (let ((default-directory (or dir default-directory)))
+    (ido-find-file)))
+
+;;;###autoload
 (defun utl-sudo-find-file (&optional arg)
   "Find current file or dired directory with root privileges.
 If ARG is nil use `find-alternate-file', otherwise - `find-file'."
