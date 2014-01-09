@@ -30,6 +30,14 @@
     (disable-theme utl-current-theme)
     (setq utl-current-theme nil)))
 
+;; idea from <https://gist.github.com/joehakimrahme/6305195>
+;;;###autoload
+(defun utl-load-random-theme ()
+  "Load any random theme from the available ones."
+  (interactive)
+  (let ((themes-list (custom-available-themes)))
+    (utl-load-theme (nth (random (length themes-list))
+                         themes-list))))
 
 ;;; Working with faces
 
