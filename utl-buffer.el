@@ -27,17 +27,46 @@ Return nil, if there is no such live buffer."
     (kill-new buffer-file-name)
     (message buffer-file-name)))
 
+
+;;; Switching to some buffers
+
 (defun utl-switch-to-buffer-or-funcall (buffer &optional fun)
   "Switch to the buffer BUFFER-OR-NAME or call a function FUN.
 BUFFER-OR-NAME can be a string, a buffer object or a function
 returning one of those.  If there is no such buffer, call a
 function FUN if it is specified."
-  (let ((buf (get-buffer (if (functionp buffer)
-                             (funcall buffer)
-                           buffer))))
+  (let ((buf (if (functionp buffer)
+                 (funcall buffer)
+               buffer)))
     (if buf
-        (switch-to-buffer buf)
+        (switch-to-buffer (get-buffer buf))
       (and fun (funcall fun)))))
+
+;;;###autoload
+(defun utl-switch-to-characters ()
+  "Switch to the buffer with unicode characters."
+  (interactive)
+  (utl-switch-to-buffer-or-funcall
+   "*Character List*"
+   (lambda () (list-charset-chars 'unicode-bmp))))
+
+;;;###autoload
+(defun utl-switch-to-packages ()
+  "Switch to the buffer with packages."
+  (interactive)
+  (utl-switch-to-buffer-or-funcall
+   "*Packages*" #'list-packages))
+
+;;;###autoload
+(defun utl-switch-to-w3m ()
+  "Switch to the `w3m' buffer."
+  (interactive)
+  (utl-switch-to-buffer-or-funcall
+   (lambda ()
+     (if (fboundp 'w3m-alive-p)
+         (w3m-alive-p)
+       (error "w3m is not running")))
+   #'w3m))
 
 (provide 'utl-buffer)
 
