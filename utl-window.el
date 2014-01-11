@@ -8,6 +8,7 @@
 
 ;;; Make 2 windows
 
+;;;###autoload
 (defun utl-make-2-windows (&optional fun)
   "Make 2 windows in the current frame.
 FUN is a function for splitting
@@ -38,6 +39,8 @@ If there are more windows, show current and previous buffer in new
 windows."
   (interactive)
   (utl-make-2-windows 'split-window-right))
+
+
 
 ;;;###autoload
 (defun utl-switch-windows ()

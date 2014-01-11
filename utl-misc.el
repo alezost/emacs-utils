@@ -59,6 +59,7 @@ With prefix, prompt for directory as well."
 
 ;;; Spelling and languages
 
+;;;###autoload
 (defun utl-set-isearch-input-method (input-method)
   "Activate input method INPUT-METHOD in interactive search.
 See `set-input-method' for details."

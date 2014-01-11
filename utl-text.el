@@ -27,30 +27,37 @@
 
 ;;; Pairs of symbols
 
+;;;###autoload
 (defun utl-insert-curly-brackets (&optional arg)
   "Similar to `insert-parentheses', except it inserts \{\}."
   (interactive "P")
   (insert-pair arg ?\{ ?\}))
+;;;###autoload
 (defun utl-insert-square-brackets (&optional arg)
   "Similar to `insert-parentheses', except it inserts \[\]."
   (interactive "P")
   (insert-pair arg ?\[ ?\]))
+;;;###autoload
 (defun utl-insert-angle-brackets (&optional arg)
   "Similar to `insert-parentheses', except it inserts <>."
   (interactive "P")
   (insert-pair arg ?\< ?\>))
+;;;###autoload
 (defun utl-insert-single-quotation (&optional arg)
   "Similar to `insert-parentheses', except it inserts ''."
   (interactive "P")
   (insert-pair arg ?\' ?\'))
+;;;###autoload
 (defun utl-insert-double-quotation (&optional arg)
   "Similar to `insert-parentheses', except it inserts \"\"."
   (interactive "P")
   (insert-pair arg ?\" ?\"))
+;;;###autoload
 (defun utl-insert-grave-quotation (&optional arg)
   "Similar to `insert-parentheses', except it inserts `'."
   (interactive "P")
   (insert-pair arg ?\` ?\'))
+;;;###autoload
 (defun utl-insert-angle-quotation (&optional arg)
   "Similar to `insert-parentheses', except it inserts `'."
   (interactive "P")
@@ -59,6 +66,7 @@
 
 ;;; Search and replace
 
+;;;###autoload
 (defun utl-re-search-forward (regexp)
   "The function is similar to `re-search-forward' except it continues
 the search from the beginning of the buffer if it did not succeed."
@@ -150,11 +158,13 @@ If NOERROR is non-nil, just return nil if fail (no error)."
   "\f\n"
   "String for separating text in elisp code.")
 
+;;;###autoload
 (defun utl-insert-delimiter ()
   "Insert `utl-delimiter' at point."
   (interactive)
   (insert utl-delimiter))
 
+;;;###autoload
 (defun utl-insert-date (&optional arg)
   "Insert date at point.
 If ARG is nil, use current date.
@@ -164,6 +174,7 @@ If ARG is non-nil, prompt for a date."
               (org-read-date)
             (format-time-string "%Y-%m-%d"))))
 
+;;;###autoload
 (defun utl-insert-clipboard ()
   "Insert the clipboard contents.
 It differs from `x-clipboard-yank' as it doesn't destroy what you
@@ -174,11 +185,13 @@ paste with \\[yank]."
           (insert clp)
         (message "Clipboard is empty."))))
 
+;;;###autoload
 (defun utl-flush-blank-lines (start end)
   "Delete all empty lines in selected region."
   (interactive "r")
   (flush-lines "^\\s-*$" start end nil))
 
+;;;###autoload
 (defun utl-delete-blank-lines ()
   "Delete blank lines.
 If region is active, call `utl-flush-blank-lines',
@@ -188,12 +201,14 @@ otherwise call `delete-blank-lines'."
       (utl-flush-blank-lines (region-beginning) (region-end))
     (delete-blank-lines)))
 
+;;;###autoload
 (defun utl-kill-line (arg)
   "Similar to `kill-line' but kill including its terminating newline."
   (interactive "p")
   (kill-region (point)
                (progn (forward-visible-line arg) (point))))
 
+;;;###autoload
 (defun utl-backward-kill-line (arg)
   "Kill line to its beginning.
 With prefix argument ARG, kill that many lines backward including current."
@@ -201,6 +216,7 @@ With prefix argument ARG, kill that many lines backward including current."
   (kill-region (point)
                (progn (forward-visible-line (- 1 arg)) (point))))
 
+;;;###autoload
 (defun utl-save-line (arg)
   "Similar to `kill-line' but save in a kill ring without killing."
   (interactive "p")
@@ -210,6 +226,7 @@ With prefix argument ARG, kill that many lines backward including current."
                     (end-of-visible-line)
                     (point))))
 
+;;;###autoload
 (defun utl-backward-save-line (arg)
   "Similar to `utl-backward-kill-line' but save in a kill ring without killing."
   (interactive "p")
@@ -218,6 +235,7 @@ With prefix argument ARG, kill that many lines backward including current."
                     (forward-visible-line (- 1 arg))
                     (point))))
 
+;;;###autoload
 (defun utl-save-whole-line (arg)
   "Save current line as if killed, but don't kill it.
 With ARG, save that many lines."
@@ -230,6 +248,7 @@ With ARG, save that many lines."
                       (forward-visible-line arg)
                       (point)))))
 
+;;;###autoload
 (defun utl-duplicate-line (arg)
   "Duplicate current line.
 With ARG, do that many same lines.
@@ -244,6 +263,7 @@ If ARG > 0, left the point on the last line, otherwise - on the first one."
     (dotimes (i (abs arg))
       (yank))))
 
+;;;###autoload
 (defun utl-save-word (arg)
   "Save characters forward until encountering the end of a word.
 Save word as if killed, but don't kill it.
@@ -252,6 +272,7 @@ With argument ARG, do this that many times."
   (kill-ring-save (point)
                   (save-excursion (forward-word arg) (point))))
 
+;;;###autoload
 (defun utl-backward-save-word (arg)
   "Save characters backward until encountering the end of a word.
 Save word as if killed, but don't kill it.
@@ -259,6 +280,7 @@ With argument ARG, do this that many times."
   (interactive "p")
   (utl-save-word (- (or arg 1))))
 
+;;;###autoload
 (defun utl-save-sexp (arg)
   "Save characters forward until encountering the end of a sexp.
 Save sexp as if killed, but don't kill it.
@@ -267,6 +289,7 @@ With argument ARG, do this that many times."
   (kill-ring-save (point)
                   (save-excursion (forward-sexp arg) (point))))
 
+;;;###autoload
 (defun utl-backward-save-sexp (arg)
   "Save characters backward until encountering the end of a sexp.
 Save sexp as if killed, but don't kill it.
@@ -274,6 +297,7 @@ With argument ARG, do this that many times."
   (interactive "p")
   (utl-save-sexp (- (or arg 1))))
 
+;;;###autoload
 (defun utl-decode-region (beg end)
   "Replace selected text hexified by a browser with decoded one."
   (interactive "r")
@@ -287,11 +311,11 @@ With argument ARG, do this that many times."
 (defun utl-get-string (&optional msg)
   "Return a string from selected region or prompt for it.
 Use message MSG in a prompt."
-  (interactive)
   (if (use-region-p)
       (buffer-substring-no-properties (region-beginning) (region-end))
     (read-string (or msg "Enter a string: "))))
 
+;;;###autoload
 (defun utl-downcase-dwim (arg)
   "Use `downcase-region', if region is active, and `downcase-word' otherwise."
   (interactive "p")
@@ -299,6 +323,7 @@ Use message MSG in a prompt."
       (downcase-region (region-beginning) (region-end))
     (downcase-word arg)))
 
+;;;###autoload
 (defun utl-upcase-dwim (arg)
   "Use `upcase-region', if region is active, and `upcase-word' otherwise."
   (interactive "p")
@@ -306,6 +331,7 @@ Use message MSG in a prompt."
       (upcase-region (region-beginning) (region-end))
     (upcase-word arg)))
 
+;;;###autoload
 (defun utl-capitalize-dwim (arg)
   "Use `capitalize-region', if region is active, and `capitalize-word' otherwise."
   (interactive "p")
@@ -313,6 +339,7 @@ Use message MSG in a prompt."
       (capitalize-region (region-beginning) (region-end))
     (capitalize-word arg)))
 
+;;;###autoload
 (defun utl-delete-horizontal-space (&optional direction)
   "Delete all spaces and tabs around point.
 If DIRECTION is positive, delete them after point,
@@ -336,6 +363,7 @@ if it's negative - delete before point."
                 (constrain-to-field nil cur t))))
     (delete-region beg end)))
 
+;;;###autoload
 (defun utl-comment-dwirm (arg)
   "Call the comment command you want (Do What I Really Mean).
 Similar to `comment-dwim' except if the region is not active,
@@ -345,6 +373,7 @@ call `comment-line'."
       (comment-dwim nil)
     (utl-comment-line arg)))
 
+;;;###autoload
 (defun utl-comment-line (arg)
   "Comment or uncomment current line.
 If a prefix ARG is non-nil, use that many lines."
@@ -354,6 +383,7 @@ If a prefix ARG is non-nil, use that many lines."
   (comment-or-uncomment-region (point-at-bol)
                                (point-at-eol arg)))
 
+;;;###autoload
 (defun utl-dabbrev-expand-word (arg)
   "Expand current word.
 Like `dabbrev-expand' but use word symbols only."
@@ -383,12 +413,14 @@ If no number at the point, search forward til the end of the line."
       (insert (number-to-string new-num))
       (message "Number %d was changed to number %d" old-num new-num))))
 
+;;;###autoload
 (defun utl-number-up (&optional arg)
   "Increase the number at the point by one.
 With prefix ARG, change that many numbers."
   (interactive "p")
   (utl-number-change arg))
 
+;;;###autoload
 (defun utl-number-down (&optional arg)
   "Decrease the number at the point by one.
 With prefix ARG, change that many numbers."
@@ -398,11 +430,16 @@ With prefix ARG, change that many numbers."
 
 ;;; Scrolling and moving
 
+;;;###autoload
 (defun utl-scroll-down-1  () (interactive) (scroll-down 1))
+;;;###autoload
 (defun utl-scroll-up-1    () (interactive) (scroll-up 1))
+;;;###autoload
 (defun utl-scroll-right-1 () (interactive) (scroll-right 1))
+;;;###autoload
 (defun utl-scroll-left-1  () (interactive) (scroll-left 1))
 
+;;;###autoload
 (defun utl-beginning-of-line ()
   "Move point to beginning of current line.
 If the point is in the beginning of line already,
@@ -410,6 +447,7 @@ move to beginning of previous one."
   (interactive)
   (beginning-of-line (if (= (point) (point-at-bol)) 0 1)))
 
+;;;###autoload
 (defun utl-end-of-line ()
   "Move point to end of current line.
 If the point is in the end of line already,
