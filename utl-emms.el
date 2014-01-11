@@ -35,7 +35,7 @@
   "Add url or a list of urls to emms playlist."
   (with-current-emms-playlist
     ;; use `emms-sourse-add' instead of `emms-add-url' because
-    ;; the last one run `emms-play-url' if prefix is specified
+    ;; the last one runs `emms-play-url' if prefix is specified
     (if (listp url)
         (dolist (u url)
           (emms-source-add 'emms-source-url u))
