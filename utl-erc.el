@@ -185,6 +185,21 @@ Similar to `erc-away-time', but no need to be in ERC buffer."
      (format "VERSION %s." (erc-version))))
   nil)
 
+
+;;; Log
+
+(defun utl-erc-log-file-name-network-channel (buffer target nick server port)
+  "Return erc log-file name of network (or server) and channel names.
+The result file name is in the form \"network_channel.txt\".
+This function is suitable for `erc-generate-log-file-name-function'."
+  (with-current-buffer buffer
+    (let* ((target (erc-default-target)) ; nil for server buffer
+           (file (concat (or (erc-network-name) server)
+                         (and target (concat "_" target))
+                         ".txt")))
+      ;; we need a make-safe-file-name function.
+      (convert-standard-filename file))))
+
 (provide 'utl-erc)
 
 ;;; utl-erc.el ends here
