@@ -15,6 +15,7 @@
          program
          (remove nil (list args (dired-get-file-for-visit)))))
 
+;; moving to the first/last files - from <http://whattheemacsd.com/>
 (defun utl-dired-beginning-of-buffer ()
   "Move point to the first file."
   (interactive)
