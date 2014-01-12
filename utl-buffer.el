@@ -38,8 +38,9 @@ function FUN if it is specified."
   (let ((buf (if (functionp buffer)
                  (funcall buffer)
                buffer)))
-    (if buf
-        (switch-to-buffer (get-buffer buf))
+    (if (and buf
+             (setq buf (get-buffer buf)))
+        (switch-to-buffer buf)
       (and fun (funcall fun)))))
 
 ;;;###autoload
