@@ -428,16 +428,7 @@ With prefix ARG, change that many numbers."
   (utl-number-change (- arg)))
 
 
-;;; Scrolling and moving
-
-;;;###autoload
-(defun utl-scroll-down-1  () (interactive) (scroll-down 1))
-;;;###autoload
-(defun utl-scroll-up-1    () (interactive) (scroll-up 1))
-;;;###autoload
-(defun utl-scroll-right-1 () (interactive) (scroll-right 1))
-;;;###autoload
-(defun utl-scroll-left-1  () (interactive) (scroll-left 1))
+;;; Moving
 
 ;;;###autoload
 (defun utl-beginning-of-line ()
