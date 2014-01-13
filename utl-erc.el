@@ -148,7 +148,7 @@ Similar to `erc-away-time', but no need to be in ERC buffer."
     (erc-away-time)))
 
 
-;; CTCP info
+;;; CTCP info
 
 (defun utl-erc-ctcp-query-FINGER (proc nick login host to msg)
   "Respond to a CTCP FINGER query."
