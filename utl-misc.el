@@ -12,8 +12,9 @@
 ;;;###autoload
 (defun utl-apply (fun &rest args)
   "Same as `apply', but check if a function is bound."
-  (and (fboundp fun)
-       (apply fun args)))
+  (if (fboundp fun)
+      (apply fun args)
+    (message "Function `%s' is unbound." fun)))
 
 (defun utl-read-string (prompt &optional initial-input history
                               default-value inherit-input-method)
