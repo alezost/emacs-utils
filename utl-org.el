@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'utl-text)
+(require 'org)
 (require 'org-table)
 
 (defun utl-org-get-time-stamp (time &optional with-hm)
@@ -76,6 +77,66 @@ row."
   (and (utl-re-search-forward "^[^|]")
        (utl-re-search-forward "^|")
        (org-table-goto-line (+ 1 (org-table-current-line)))))
+
+
+;;; EMMS links
+
+;; To add a possibility of making org links for emms tracks under the
+;; point in `emms-playlist-mode' use the following lines:
+
+;; (eval-after-load 'org '(org-add-link-type "emms" 'utl-org-emms-open))
+;; (add-hook 'org-store-link-functions 'utl-org-emms-store-link)
+
+(defcustom utl-org-emms-sleep 5
+  "Time in seconds after starting to play url before seeking to time."
+  :type 'integer
+  :group 'emacs-utils)
+
+;;;###autoload
+(defun utl-org-emms-open (link)
+  "Open emms link LINK."
+  (let ((path link)
+        sec)
+    (if (string-match "::\\([0-9]+\\)\\'" link)
+        (setq sec (string-to-number (match-string 1 link))
+              path (substring link 0 (match-beginning 0))))
+    ;; TODO Use some emacs variable for matching url (there is
+    ;; `ffap-url-regexp' but it can be modified by a user).
+    (if (string-match "^\\(ftp\\|https?\\)://" path)
+        (progn (emms-play-url path)
+               ;; we need to wait while the backend will start to play
+               (and sec (sleep-for utl-org-emms-sleep)))
+      (emms-play-file path))
+    (and sec (emms-seek-to sec))))
+
+;;;###autoload
+(defun utl-org-emms-store-link ()
+  "Store link for the current playing file in EMMS."
+  (when (eq major-mode 'emms-playlist-mode)
+    (let ((link (utl-org-emms-make-link
+                 (emms-playlist-track-at (point)))))
+      (org-store-link-props
+       :type        "emms"
+       :link        (car link)
+       :description (cdr link)))))
+
+(defun utl-org-emms-make-link (&optional track)
+  "Return org link for the EMMS track TRACK or current track.
+The return value is a cons cell (link . description)."
+  (or track
+      (setq track (emms-playlist-current-selected-track))
+      (error "Couldn't find a track"))
+  (let ((path (emms-track-simple-description track))
+        (desc (emms-info-track-description track))
+        (sec (and (equal track (emms-playlist-current-selected-track))
+                  (boundp 'emms-playing-time-p)
+                  emms-playing-time-p
+                  (/= 0 emms-playing-time)
+                  emms-playing-time)))
+    (cons (concat "emms:" path
+                  (and sec (concat "::" (number-to-string sec))))
+          ;; if description is the same as path, do not add it
+          (unless (string= path desc) desc))))
 
 (provide 'utl-org)
 
