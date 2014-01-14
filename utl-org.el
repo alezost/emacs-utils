@@ -100,13 +100,20 @@ row."
     (if (string-match "::\\([0-9]+\\)\\'" link)
         (setq sec (string-to-number (match-string 1 link))
               path (substring link 0 (match-beginning 0))))
-    ;; TODO Use some emacs variable for matching url (there is
-    ;; `ffap-url-regexp' but it can be modified by a user).
-    (if (string-match "^\\(ftp\\|https?\\)://" path)
-        (progn (emms-play-url path)
-               ;; we need to wait while the backend will start to play
-               (and sec (sleep-for utl-org-emms-sleep)))
-      (emms-play-file path))
+    ;; Don't reload a track (just seek to time) if we want to open a
+    ;; link with currently played file and some specified time.
+    (unless (and (fboundp 'emms-track-name)
+                 (string= path
+                          (emms-track-name
+                           (emms-playlist-current-selected-track)))
+                 sec)
+      ;; TODO Use some emacs variable for matching url (there is
+      ;; `ffap-url-regexp' but it can be modified by a user).
+      (if (string-match "^\\(ftp\\|https?\\)://" path)
+          (progn (emms-play-url path)
+                 ;; we need to wait while the backend will start to play
+                 (and sec (sleep-for utl-org-emms-sleep)))
+        (emms-play-file path)))
     (and sec (emms-seek-to sec))))
 
 ;;;###autoload
