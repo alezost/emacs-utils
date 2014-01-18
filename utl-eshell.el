@@ -32,7 +32,7 @@
           (eshell/whoami)
           (utl-with-face "@"
                         'escape-glyph)
-          "leviafan" ;; TODO how to get host name?
+          system-name
           (utl-with-face (abbreviate-file-name (eshell/pwd))
                         'dired-directory)
           (utl-with-face (if (= (user-uid) 0) "#" "$")
