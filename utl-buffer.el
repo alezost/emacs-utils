@@ -27,6 +27,14 @@ Return nil, if there is no such live buffer."
     (kill-new buffer-file-name)
     (message buffer-file-name)))
 
+;;;###autoload
+(defun utl-major-mode-to-kill-ring ()
+  "Put major mode name of the current buffer into kill ring."
+  (interactive)
+  (let ((mode (symbol-name major-mode)))
+    (kill-new mode)
+    (message mode)))
+
 
 ;;; Switching to some buffers
 
