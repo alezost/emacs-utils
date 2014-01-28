@@ -428,6 +428,56 @@ With prefix ARG, change that many numbers."
   (utl-number-change (- arg)))
 
 
+;;; Changing the case of previous word(s)
+
+;; Idea from <http://www.emacswiki.org/emacs/sequential-command.el>.
+
+;; Example of key bindings:
+;;   (global-set-key (kbd "s-d") 'utl-downcase-word-backward)
+;;   (global-set-key (kbd "s-c") 'utl-capitalize-word-backward)
+;;   (global-set-key (kbd "s-u") 'utl-upcase-word-backward)
+
+;; When a key binding is pressed, the previous word is changed, if it
+;; (or another key bound to those function) is pressed again, the word
+;; before the previous is changed and so on.
+
+(defvar utl-word-position nil
+  "Last saved position.
+Used for `utl-downcase-word-backward',
+`utl-capitalize-word-backward' and `utl-upcase-word-backward'.")
+
+(defvar utl-word-seq-functions nil
+  "List of commands for sequential modifying the case of a word.")
+
+(defmacro utl-change-word-backward (name fun)
+  "Make a function for sequential changing previous word(s).
+Resulting function `utl-NAME-word-backward' will be added to
+`utl-word-seq-functions'.
+Function FUN is called in body of the resulting function for updating
+the word.  It should accept a number of modified words as argument."
+  (let ((fun-name (intern (concat "utl-" name "-word-backward"))))
+    (add-to-list 'utl-word-seq-functions fun-name)
+    `(defun ,fun-name (arg)
+       ,(concat (capitalize name)
+                " previous word (or ARG words), do not move the point.\n"
+                "Multiple calls will change previous words sequentially.")
+       (interactive "p")
+       (save-excursion
+         (when (memq last-command utl-word-seq-functions)
+           (goto-char utl-word-position))
+         (backward-word arg)
+         (setq utl-word-position (point))
+         (,fun arg)))))
+
+(utl-change-word-backward "downcase" downcase-word)
+(utl-change-word-backward "capitalize" capitalize-word)
+(utl-change-word-backward "upcase" upcase-word)
+
+;;;###autoload (autoload 'utl-downcase-word-backward "utl-text" nil t)
+;;;###autoload (autoload 'utl-capitalize-word-backward "utl-text" nil t)
+;;;###autoload (autoload 'utl-upcase-word-backward "utl-text" nil t)
+
+
 ;;; Moving
 
 ;;;###autoload
