@@ -71,6 +71,20 @@ The variable CURRENT-FRAME affects nothing, it is used for
   (interactive)
   (shell-command "wmctrl -r :ACTIVE: -b add,maximized_vert,maximized_horz"))
 
+
+;; Update WINDOWS_NUM property for a stumpwm command, see
+;; <https://github.com/alezost/stumpwmrc/blob/master/utils.lisp>.
+;; Intended to be used with:
+;; (add-hook 'window-configuration-change-hook 'utl-set-windows-num-property)
+;;;###autoload
+(defun utl-set-windows-num-property ()
+  "Set X window property WINDOWS_NUM to the current number of windows."
+  (and (display-graphic-p)
+       (x-change-window-property
+        "WINDOWS_NUM"
+        (string (length (window-list)))
+        nil nil nil t)))
+
 (provide 'utl-window)
 
 ;;; utl-window.el ends here
