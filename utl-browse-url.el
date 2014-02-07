@@ -42,15 +42,15 @@ Conkeror."
   "Choose a browser for openning URL."
   (interactive "sURL: ")
   (let ((choice (read-char
-                 (format "Choose a browser for '%s'\n(c - conkeror (default), f - firefox, w - w3m): "
+                 (format "Choose a browser for '%s'\n(c - conkeror, f - firefox, w - w3m, e - eww): "
                          url))))
     (funcall
-     (cond
-      ((or (equal choice ?c)
-           (equal choice 13)) 'utl-browse-url-conkeror)
-      ((equal choice ?f)      'browse-url-firefox)
-      ((equal choice ?w)      'w3m-browse-url)
-      (t (error "Wrong answer, use 'c', 'f' or 'w'")))
+     (cl-case choice
+       ((?c 13) 'utl-browse-url-conkeror)
+       (?f      'browse-url-firefox)
+       (?w      'w3m-browse-url)
+       (?e      'eww)
+       (t (error "Wrong answer, use 'c', 'f', 'w' or 'e'")))
      url)))
 
 (provide 'utl-browse-url)
