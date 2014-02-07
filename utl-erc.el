@@ -106,20 +106,16 @@ Similar to `erc-quit-server', but without prompting for REASON."
   (view-file (erc-current-logfile)))
 
 (defun utl-erc-ghost-maybe (server nick)
-  "Send GHOST message to NickServ if NICK ends with \"`\".
+  "Send GHOST message to NickServ if NICK ends with `erc-nick-uniquifier'.
 The function is suitable for `erc-after-connect'."
-  (when (string-match "\\(.*?\\)`+$" nick)
+  (when (string-match (format "\\(.*?\\)%s+$" erc-nick-uniquifier) nick)
     (let ((nick-orig (match-string 1 nick))
           (password erc-session-password))
-      (when (y-or-n-p (format "Current nick is '%s'. Do you want to ghost?"
-                              nick))
-        ;; (y-or-n-p (format "NICK_ORIG - %s, NICK_CUR - %s, PWD - %s; ghost?"
-        ;;                   nick-orig nick password))
-        (erc-message "PRIVMSG" (format "NickServ GHOST %s %s"
-                                       nick-orig password))
-        (erc-cmd-NICK nick-orig)
-        (erc-message "PRIVMSG" (format "NickServ IDENTIFY %s %s"
-                                       nick-orig password))))))
+      (erc-message "PRIVMSG" (format "NickServ GHOST %s %s"
+                                     nick-orig password))
+      (erc-cmd-NICK nick-orig)
+      (erc-message "PRIVMSG" (format "NickServ IDENTIFY %s %s"
+                                     nick-orig password)))))
 
 
 ;;; Away
