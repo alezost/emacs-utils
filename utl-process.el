@@ -13,6 +13,18 @@
     (apply 'start-process
            process-name buffer-name program args)))
 
+;; idea from <http://stackoverflow.com/questions/11572934/how-do-i-kill-a-running-process-in-emacs>
+;;;###autoload
+(defun utl-kill-process (process)
+  "Kill PROCESS.
+See `delete-process' for the meaning of PROCESS.
+Interactively prompt for PROCESS name."
+  (interactive
+   (list (get-process (ido-completing-read
+                       "Kill process: "
+                       (mapcar 'process-name (process-list))))))
+  (delete-process process))
+
 (provide 'utl-process)
 
 ;;; utl-process.el ends here
