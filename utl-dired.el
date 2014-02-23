@@ -19,13 +19,13 @@
 (defun utl-dired-beginning-of-buffer ()
   "Move point to the first file."
   (interactive)
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (dired-next-line 4))
 
 (defun utl-dired-end-of-buffer ()
   "Move point to the last file."
   (interactive)
-  (end-of-buffer)
+  (goto-char (point-max))
   (dired-next-line -1))
 
 (defun utl-dired-find-file (&optional arg)
