@@ -77,6 +77,20 @@ function FUN if it is specified."
        (error "w3m is not running")))
    #'w3m))
 
+;;;###autoload
+(defun utl-switch-to-aurel-list ()
+  "Switch to the `aurel-list-buffer-name' buffer."
+  (interactive)
+  (utl-switch-to-buffer-or-funcall
+   aurel-list-buffer-name #'aurel-package-search))
+
+;;;###autoload
+(defun utl-switch-to-aurel-info ()
+  "Switch to the `aurel-info-buffer-name' buffer."
+  (interactive)
+  (utl-switch-to-buffer-or-funcall
+   aurel-info-buffer-name #'aurel-package-info))
+
 (provide 'utl-buffer)
 
 ;;; utl-buffer.el ends here
