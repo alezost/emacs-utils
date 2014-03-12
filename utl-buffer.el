@@ -18,22 +18,40 @@ Return nil, if there is no such live buffer."
       (if (string-match-p regexp (buffer-name buffer))
           (setq buffers (cons buffer buffers))))))
 
+
+;;; Putting buffer info into kill ring
+
+(defun utl-funcall-to-kill-ring (fun error-msg)
+  "Call function FUN and put its result (string) into `kill-ring'.
+Also display result string in minibuffer.
+ERROR-MSG is a format string with one '%s' form, used as an error
+message for a case when FUN does not return a string."
+  (let ((out (funcall fun)))
+    (or (stringp out)
+        (error error-msg out))
+    (kill-new out)
+    (message out)))
+
+;;;###autoload
+(defun utl-buffer-name-to-kill-ring ()
+  "Put a name of the current buffer into `kill-ring'."
+  (interactive)
+  (utl-funcall-to-kill-ring
+   'buffer-name "buffer-name has returned %s"))
+
 ;;;###autoload
 (defun utl-file-name-to-kill-ring ()
-  "Put a name of the file visited by the current buffer into kill ring."
+  "Put a name of the file visited by the current buffer into `kill-ring'."
   (interactive)
-  (if (null buffer-file-name)
-      (message "buffer-file-name is nil (not visiting a file)")
-    (kill-new buffer-file-name)
-    (message buffer-file-name)))
+  (utl-funcall-to-kill-ring
+   'buffer-file-name "buffer-file-name has returned %s"))
 
 ;;;###autoload
 (defun utl-major-mode-to-kill-ring ()
-  "Put major mode name of the current buffer into kill ring."
+  "Put major mode name of the current buffer into `kill-ring'."
   (interactive)
-  (let ((mode (symbol-name major-mode)))
-    (kill-new mode)
-    (message mode)))
+  (utl-funcall-to-kill-ring
+   (lambda () (symbol-name major-mode)) "major-mode is %s"))
 
 
 ;;; Switching to some buffers
