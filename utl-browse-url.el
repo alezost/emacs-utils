@@ -37,21 +37,47 @@ Conkeror."
 
 
 
+(defvar utl-browser-choices
+  '((?c "conkeror" utl-browse-url-conkeror)
+    (?f "firefox" browse-url-firefox)
+    (?w "w3m" w3m-browse-url)
+    (?e "eww" eww))
+  "List of the browser choices for `utl-choose-browser'.
+Each choice has a form:
+
+  (CHAR NAME FUN)
+
+CHAR is a pressed character.
+NAME is a name of the browser.
+FUN is a function to call for browsing (should take URL as an argument).
+
+The first choice is used as default (pressing RET will call the
+first function).")
+
 ;;;###autoload
 (defun utl-choose-browser (url &rest args)
-  "Choose a browser for openning URL."
+  "Choose a browser for openning URL.
+Suitable for `browse-url-browser-function'."
   (interactive "sURL: ")
-  (let ((choice (read-char
-                 (format "Choose a browser for '%s'\n(c - conkeror, f - firefox, w - w3m, e - eww): "
-                         url))))
-    (funcall
-     (cl-case choice
-       ((?c 13) 'utl-browse-url-conkeror)
-       (?f      'browse-url-firefox)
-       (?w      'w3m-browse-url)
-       (?e      'eww)
-       (t (error "Wrong answer, use 'c', 'f', 'w' or 'e'")))
-     url)))
+  (let* ((chars (mapcar 'car utl-browser-choices))
+         (choices-str (mapconcat
+                       (lambda (assoc)
+                         (format "%c (%s)" (car assoc) (cadr assoc)))
+                       utl-browser-choices
+                       ", "))
+         (choice (read-char
+                  (format "Choose a browser for '%s'\n%s: "
+                          url choices-str)))
+         (fun (cond
+               ((member choice chars)
+                (car (last (assoc choice utl-browser-choices))))
+               ;; RET can be in `utl-browser-choices', so check it after
+               ;; the members.
+               ((= choice 13)
+                (car (last (car utl-browser-choices))))
+               (t (user-error "Wrong answer, press: RET (default), %s"
+                              choices-str)))))
+    (funcall fun url)))
 
 (provide 'utl-browse-url)
 
