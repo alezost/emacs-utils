@@ -82,14 +82,16 @@ function FUN if it is specified."
   "Switch to the `aurel-list-buffer-name' buffer."
   (interactive)
   (utl-switch-to-buffer-or-funcall
-   aurel-list-buffer-name #'aurel-package-search))
+   aurel-list-buffer-name
+   (lambda () (call-interactively 'aurel-package-search))))
 
 ;;;###autoload
 (defun utl-switch-to-aurel-info ()
   "Switch to the `aurel-info-buffer-name' buffer."
   (interactive)
   (utl-switch-to-buffer-or-funcall
-   aurel-info-buffer-name #'aurel-package-info))
+   aurel-info-buffer-name
+   (lambda () (call-interactively 'aurel-package-info))))
 
 (provide 'utl-buffer)
 
