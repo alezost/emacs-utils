@@ -30,6 +30,17 @@ With prefix argument indent without offset for second lines."
    (let ((lisp-indent-offset (and arg 1)))
      (indent-sexp)))
 
+;;;###autoload
+(defun utl-quelpa-update-install ()
+  "Update or install quelpa."
+  (interactive)
+  ;; from <https://github.com/quelpa/quelpa>
+  (if (require 'quelpa nil t)
+    (quelpa '(quelpa :repo "quelpa/quelpa" :fetcher github) :upgrade t)
+  (with-temp-buffer
+    (url-insert-file-contents "https://raw.github.com/quelpa/quelpa/master/bootstrap.el")
+    (eval-buffer))))
+
 (provide 'utl-elisp)
 
 ;;; utl-elisp.el ends here
