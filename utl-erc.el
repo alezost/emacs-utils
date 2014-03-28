@@ -100,11 +100,6 @@ Similar to `erc-quit-server', but without prompting for REASON."
       (utl-erc-server-buffer-name)
     (erc-cmd-QUIT reason)))
 
-(defun utl-erc-view-log-file ()
-  "Visit a log file for current ERC buffer."
-  (interactive)
-  (view-file (erc-current-logfile)))
-
 (defun utl-erc-ghost-maybe (server nick)
   "Send GHOST message to NickServ if NICK ends with `erc-nick-uniquifier'.
 The function is suitable for `erc-after-connect'."
@@ -184,6 +179,11 @@ Similar to `erc-away-time', but no need to be in ERC buffer."
 
 ;;; Log
 
+(defun utl-erc-view-log-file ()
+  "Visit a log file for current ERC buffer."
+  (interactive)
+  (view-file (erc-current-logfile)))
+
 (defun utl-erc-log-file-name-network-channel (buffer target nick server port)
   "Return erc log-file name of network (or server) and channel names.
 The result file name is in the form \"network_channel.txt\".
@@ -195,6 +195,27 @@ This function is suitable for `erc-generate-log-file-name-function'."
                          ".txt")))
       ;; we need a make-safe-file-name function.
       (convert-standard-filename file))))
+
+;; If you want to exclude a particular channel "#foochannel" and
+;; channels that have "beard" in their names, use the following:
+;;
+;; (setq utl-erc-log-excluded-regexps '("\\`#foochannel" "beard"))
+;; (setq erc-enable-logging 'utl-erc-log-all-but-some-buffers)
+;;
+;; Note: channel buffers may have names like "#foobar<2>", so too strict
+;; regexps like "\\`#foochannel\\'" may not be not good.
+
+(defvar utl-erc-log-excluded-regexps nil
+  "List of regexps for erc buffer names that will not be logged.")
+
+(defun utl-erc-log-all-but-some-buffers (buffer)
+  "Return t if logging should be enabled for BUFFER.
+Use `utl-erc-log-excluded-regexps' to check if BUFFER should be
+logged or not.
+The function is intended to be used for `erc-enable-logging'."
+  (cl-notany (lambda (re)
+               (string-match-p re (buffer-name buffer)))
+             utl-erc-log-excluded-regexps))
 
 (provide 'utl-erc)
 
