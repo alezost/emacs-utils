@@ -10,6 +10,13 @@
   (if a (not b) b))
 
 ;;;###autoload
+(defun utl-next-link ()
+  "Go to the next link."
+  (interactive)
+  (forward-char)
+  (org-next-link))
+
+;;;###autoload
 (defun utl-apply (fun &rest args)
   "Same as `apply', but check if a function is bound."
   (if (fboundp fun)
