@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'gnus)
+(require 'gnus-sum)
 (require 'utl-misc)  ; for utl-xor
 
 (defadvice smtpmail-via-smtp (around prompt-for-password)
@@ -128,6 +129,43 @@ Return nil if no matches found."
               url
             (utl-widget-find-url re)))
       (utl-widget-find-url re))))
+
+
+;;; Convert Atom to RSS
+
+;; The defadvice from <http://www.emacswiki.org/emacs/GnusRss>;
+;; "atom2rss.xsl" from <http://atom.geekhood.net/>.
+
+;; Github private feed (with info from <https://github.com>) is an Atom,
+;; so we need to convert it to use with gnus.  There is a little
+;; problem: "atom2rss.xsl" tries to insert a comment with self link to
+;; the resulting rss, but a github private link may contain "--" in it
+;; (for me this link is:
+;; "https://github.com/alezost.private.atom?token=a_lot_of_numbers_and_letters--more_numers_and_letters")
+;; and as it is not allowed in xml comments, xsltproc throws an error.
+
+;; To fix that, I commented the line:
+;;
+;;   <x:template match="atom:feed/atom:link[@rel='self']"> ...
+;;
+;; in "atom2rss.xsl" and now I can check github feed in gnus. Hooray!
+
+(defvar utl-atom2rss-file
+  (expand-file-name "atom2rss.xsl" user-emacs-directory)
+  "Path to \"atom2rss.xsl\" file for converting Atom to RSS.")
+
+(defadvice mm-url-insert (after convert-atom-to-rss)
+  "Convert Atom to RSS (if needed) by calling xsltproc."
+  (when (re-search-forward "xmlns=\"http://www.w3.org/.*/Atom\""
+			   nil t)
+    (goto-char (point-min))
+    (message "Converting Atom to RSS... ")
+    (call-process-region (point-min) (point-max)
+			 "xsltproc"
+			 t t nil
+			 utl-atom2rss-file "-")
+    (goto-char (point-min))
+    (message "Converting Atom to RSS... done")))
 
 (provide 'utl-gnus)
 
