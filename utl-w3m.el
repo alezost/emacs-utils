@@ -5,23 +5,61 @@
 
 ;;; Code:
 
-(defun utl-w3m-next-url ()
-  "Go to the next page."
-  (interactive)
-  (if w3m-next-url
-      (let ((w3m-prefer-cache t))
-        (w3m-history-store-position)
-        (w3m-goto-url w3m-next-url))
-    (message "No 'next' link found.")))
+(require 'cl-lib)
+(require 'w3m)
 
-(defun utl-w3m-previous-url ()
-  "Go to the previous page."
-  (interactive)
-  (if w3m-previous-url
-      (let ((w3m-prefer-cache t))
-        (w3m-history-store-position)
-        (w3m-goto-url w3m-previous-url))
-    (message "No 'previous' link found.")))
+
+;;; Go to the next/previous link
+
+(defvar utl-w3m-search-link-depth 10
+  "The number of links to search for the next/previous URL.
+See `utl-w3m-next-url'/`utl-w3m-previous-url' for details.")
+
+(defvar utl-w3m-search-re "\\<%s\\>"
+  "Regexp for searching next/previous URL.
+The string should contain \"%s\"-expression substituted by a
+searched word. ")
+
+(defun utl-w3m-search-url (word point fun)
+  "Search an URL anchor beginning with WORD.
+
+POINT is the start point for searching.
+
+FUN is a function used for going to an anchor (like
+`w3m-next-anchor' or `w3m-previous-anchor').  FUN is called
+`utl-w3m-search-link-depth' times.
+
+Return URL of the found anchor or nil if the link is not found."
+  (save-excursion
+    (goto-char point)
+    (cl-loop for i from 1 to utl-w3m-search-link-depth
+             do (funcall fun)
+             if (looking-at (format utl-w3m-search-re word))
+             return (w3m-anchor))))
+
+(defmacro utl-w3m-define-goto-url (type)
+  "Define a function for going to the next/previous page.
+TYPE should be a string \"next\" or \"previous\".
+Defined function has a name `utl-w3m-TYPE-url'."
+  (let ((name (intern (concat "utl-w3m-" type "-url")))
+        (desc (concat "Go to the " type " page.\n"
+                      "If `w3m-" type "-url' is nil, search in the first and last\n"
+                      "`utl-w3m-search-link-depth' links for the " type " page URL."))
+        (type-url    (intern (concat "w3m-" type "-url"))))
+    `(defun ,name ()
+       ,desc
+       (interactive)
+       (let ((url (or ,type-url
+                      (utl-w3m-search-url ,type (point-min) 'w3m-next-anchor)
+                      (utl-w3m-search-url ,type (point-max) 'w3m-previous-anchor))))
+         (if url
+             (let ((w3m-prefer-cache t))
+               (w3m-history-store-position)
+               (w3m-goto-url url))
+           (message ,(concat "No '" type "' link found.")))))))
+
+(utl-w3m-define-goto-url "next")
+(utl-w3m-define-goto-url "previous")
 
 
 ;;; Download with wget
