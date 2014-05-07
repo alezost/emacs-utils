@@ -7,28 +7,39 @@
 
 (require 'emms)
 
-(defcustom emms-big-seek-seconds 60
+(defvar utl-emms-seek-seconds 60
   "The number of seconds to seek forward or backward for
-\"custom\" seeking with `emms-seek'."
-  :group 'emms
-  :type 'number)
+\"custom\" seeking.")
 
-(defun emms-big-seek-forward ()
-  "Seek `emms-big-seek-seconds' forward."
-  (interactive)
+(defun utl-emms-seek-forward (&optional seconds)
+  "Seek by SECONDS forward.
+If SECONDS is nil, use `emms-big-seek-seconds'.
+Interactively with prefix, prompt for SECONDS."
+  (interactive
+   (list (if current-prefix-arg
+             (read-number "Seek forward by (seconds): ")
+           nil)))
   (when emms-player-playing-p
-    (emms-player-seek emms-big-seek-seconds)))
+    (emms-player-seek (or seconds utl-emms-seek-seconds))))
 
-(defun emms-big-seek-backward ()
-  "Seek `emms-big-seek-seconds' backward."
-  (interactive)
-  (when emms-player-playing-p
-    (emms-player-seek (- emms-big-seek-seconds))))
+(defun utl-emms-seek-backward (&optional seconds)
+  "Seek by SECONDS backward.
+See `utl-emms-seek-forward' for details."
+  (interactive
+   (list (if current-prefix-arg
+             (read-number "Seek backward by (seconds): ")
+           nil)))
+  (utl-emms-seek-forward (- (or seconds utl-emms-seek-seconds))))
 
-(defun emms-seek-to-minute (minutes)
-  "Seek the current player to MINUTES minutes."
-  (interactive "nMinutes to seek to: ")
-  (emms-seek-to (* 60 minutes)))
+(defun utl-emms-seek-to (seconds)
+  "Seek the current player to SECONDS.
+Interactively, prompt for the number of minutes.
+With prefix, prompt for the number of seconds."
+  (interactive
+   (list (if current-prefix-arg
+             (read-number "Seconds to seek to: ")
+           (* 60 (read-number "Minutes to seek to: ")))))
+  (emms-seek-to seconds))
 
 ;;;###autoload
 (defun utl-emms-add-url (url)
