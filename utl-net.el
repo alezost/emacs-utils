@@ -19,6 +19,14 @@ Same as `ping' but interactively complete hosts from `utl-net-hosts'."
    (list (ido-completing-read "Ping host: " utl-net-hosts)))
   (ping host))
 
+;;;###autoload
+(defun utl-traceroute (host)
+  "Traceroute HOST.
+Same as `traceroute' but interactively complete hosts from `utl-net-hosts'."
+  (interactive
+   (list (ido-completing-read "Traceroute host: " utl-net-hosts)))
+  (traceroute host))
+
 
 ;;; Router log
 
