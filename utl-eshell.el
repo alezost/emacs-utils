@@ -13,6 +13,15 @@
     (kill-region eshell-last-output-end
                  (progn (forward-line arg) (point)))))
 
+;;;###autoload
+(defun utl-eshell-cd (arg)
+  "Start eshell and change directory there to the current one.
+ARG has the same meaning as in `eshell'"
+  (interactive "P")
+  (let ((dir default-directory))
+    (eshell arg)
+    (eshell/cd dir)))
+
 
 ;;; Eshell prompt
 ;; idea from <http://www.emacswiki.org/emacs/EshellPrompt>
