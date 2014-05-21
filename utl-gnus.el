@@ -123,7 +123,9 @@ Return nil if no matches found."
         (goto-char (next-overlay-change (point)))
       (forward-char 1))
     (if (widget-tabable-at)
-        (let ((url (get-text-property (point) 'shr-url)))
+        ;; Text property with URL depends on `mm-text-html-renderer'.
+        (let ((url (or (get-text-property (point) 'gnus-string)
+                       (get-text-property (point) 'shr-url))))
           (if (and (stringp url)
                    (string-match re url))
               url
