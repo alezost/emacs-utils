@@ -10,11 +10,35 @@
   (if a (not b) b))
 
 ;;;###autoload
-(defun utl-next-link ()
+(defun utl-next-link (&optional search-backward)
   "Go to the next link."
+  ;; The function is almost the same as `org-next-link'.
   (interactive)
-  (forward-char)
-  (org-next-link))
+  (when (and org-link-search-failed
+             (eq this-command last-command))
+    (goto-char (point-min))
+    (message "Link search wrapped back to beginning of buffer"))
+  (setq org-link-search-failed nil)
+  (let* ((pos (point))
+	 (srch-fun (if search-backward
+                       're-search-backward
+                     're-search-forward)))
+    (when (looking-at org-any-link-re)
+      ;; Don't stay stuck at link without an org-link face
+      (forward-char (if search-backward -1 1)))
+    (if (funcall srch-fun org-any-link-re nil t)
+	(progn
+	  (goto-char (match-beginning 0))
+	  (if (outline-invisible-p) (org-show-context)))
+      (goto-char pos)
+      (setq org-link-search-failed t)
+      (message "No further link found"))))
+
+;;;###autoload
+(defun utl-previous-link ()
+  "Go to the previous link."
+  (interactive)
+  (utl-next-link t))
 
 ;;;###autoload
 (defun utl-apply (fun &rest args)
