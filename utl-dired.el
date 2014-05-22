@@ -50,6 +50,14 @@ If ARG is non-nil, do not use human readable format (size in bytes)."
                  (re-search-backward "\\(^.+\\)[[:blank:]]*total$")
                   (match-string 1))))))
 
+(defun utl-dired-stat (&optional arg)
+  "Call `stat' program on marked files in dired mode.
+With prefix (if ARG is non-nil), use the next ARG files instead."
+  (interactive "P")
+  (dired-do-shell-command
+   "stat" nil
+   (dired-get-marked-files t arg)))
+
 (defun utl-image-dired-unmark-thumb-original-file-backward ()
   "Move up and unmark original image file in associated dired buffer."
   (interactive)
