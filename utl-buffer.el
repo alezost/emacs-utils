@@ -53,6 +53,13 @@ message for a case when FUN does not return a string."
   (utl-funcall-to-kill-ring
    (lambda () (symbol-name major-mode)) "major-mode is %s"))
 
+;;;###autoload
+(defun utl-default-directory-to-kill-ring ()
+  "Put `default-directory' into `kill-ring'."
+  (interactive)
+  (utl-funcall-to-kill-ring
+   (lambda () default-directory) "%s"))
+
 
 ;;; Switching to some buffers
 
