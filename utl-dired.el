@@ -64,6 +64,26 @@ With prefix (if ARG is non-nil), use the next ARG files instead."
   (image-dired-backward-image)
   (image-dired-modify-mark-on-thumb-original-file 'unmark))
 
+(defun utl-dired-sort-set-mode-line ()
+  "Replacement for `dired-sort-set-mode-line'."
+  (when (eq major-mode 'dired-mode)
+    (setq mode-name
+	  (let (case-fold-search
+                (switches-name
+                 (cond ((string-match-p
+                         dired-sort-by-name-regexp dired-actual-switches)
+                        "name")
+                       ((string-match-p
+                         dired-sort-by-date-regexp dired-actual-switches)
+                        "date")
+                       (t dired-actual-switches))))
+            (concat "DE[" switches-name "]")))
+    (force-mode-line-update)))
+
+(defadvice dired-sort-set-mode-line (around utl-new-mode-name)
+  "Replace the original dired mode names with the 'improved' ones."
+  (utl-dired-sort-set-mode-line))
+
 (provide 'utl-dired)
 
 ;;; utl-dired.el ends here
