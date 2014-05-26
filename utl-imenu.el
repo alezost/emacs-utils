@@ -7,6 +7,9 @@
 
 (require 'imenu)
 
+
+;;; Sections
+
 ;; If you have sections in lisp/elisp files that begin with ";;;", you
 ;; may use the following code to add "Sections" entry in `imenu':
 ;;
@@ -50,6 +53,22 @@ as the latter function and also create elements for
              (widen)
              (imenu--generic-function imenu-generic-expression)))))
     (append js-index generic-index)))
+
+
+;;; `use-package' entries
+
+;; Idea from <https://github.com/jwiegley/use-package/issues/80>.
+
+(defvar utl-imenu-use-package-re
+  "^\\s-*(use-package\\s-+\\(\\(\\sw\\|\\s_\\)+\\)"
+  "Regexp used for `use-package' entries in imenu.")
+
+;;;###autoload
+(defun utl-imenu-add-use-package ()
+  "Add `utl-imenu-use-package-re' to `imenu-generic-expression'."
+  (add-to-list
+   'imenu-generic-expression
+   (list nil utl-imenu-use-package-re 1)))
 
 (provide 'utl-imenu)
 
