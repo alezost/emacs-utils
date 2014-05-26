@@ -1,2 +1,2 @@
 *.elc
-utils-autoloads.el
+utils-autoloads.el*
