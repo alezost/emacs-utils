@@ -5,6 +5,20 @@
 
 ;;; Code:
 
+(require 'sql)
+(require 'cl-macs)
+
+;;;###autoload
+(defun utl-sql-connect (product database user)
+  "Connect to an SQL PRODUCT using DATABASE and USER.
+Do not prompt for anything else."
+  (let ((sql-database database)
+        (sql-user user)
+        (login-var (sql-get-product-feature
+                    product :sqli-login nil t)))
+    (cl-letf (((symbol-value login-var) nil))
+      (sql-product-interactive product))))
+
 ;;; Log of sql commands
 ;; Idea from <http://www.emacswiki.org/emacs/SqlMode>.  Add to .emacs:
 ;; (add-hook 'sql-interactive-mode-hook 'utl-sql-save-history)
