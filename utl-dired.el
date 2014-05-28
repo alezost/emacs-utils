@@ -15,6 +15,12 @@
          program
          (remove nil (list args (dired-get-file-for-visit)))))
 
+(defun utl-dired-start-process-on-marked-files (program &optional args)
+  "Open marked files with a PROGRAM."
+  (apply 'utl-start-process
+         program
+         (remove nil (append args (dired-get-marked-files)))))
+
 ;; moving to the first/last files - from <http://whattheemacsd.com/>
 (defun utl-dired-beginning-of-buffer ()
   "Move point to the first file."
