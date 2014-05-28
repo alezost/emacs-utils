@@ -169,6 +169,29 @@ Return nil if no matches found."
     (goto-char (point-min))
     (message "Converting Atom to RSS... done")))
 
+
+;;; Agent mode-line string
+
+(defvar utl-gnus-plugged " ↔"
+  "Mode-line string indicating that Gnus is plugged.
+Used by `utl-change-mode-string' advice for
+`gnus-agent-make-mode-line-string'.")
+
+(defvar utl-gnus-unplugged " ↮"
+  "Mode-line string indicating that Gnus is unplugged.
+Used by `utl-change-mode-string' advice for
+`gnus-agent-make-mode-line-string'.")
+
+(defadvice gnus-agent-make-mode-line-string
+  (before utl-change-mode-string (string mouse-button mouse-func))
+  "Modify \"Plugged\"/\"Unplugged\" mode-line string.
+Use `utl-gnus-plugged' and `utl-gnus-unplugged' variables."
+  (cond
+   ((string= string " Plugged")
+    (ad-set-arg 0 utl-gnus-plugged))
+   ((string= string " Unplugged")
+    (ad-set-arg 0 utl-gnus-unplugged))))
+
 (provide 'utl-gnus)
 
 ;;; utl-gnus.el ends here
