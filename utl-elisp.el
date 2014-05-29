@@ -23,12 +23,16 @@ This function is suitable for `eldoc-argument-case' variable."
               'face 'font-lock-variable-name-face))
 
 ;;;###autoload
-(defun utl-indent-sexp (&optional arg)
+(defun utl-indent-sexp (&optional no-offset pp)
   "Indent each line of the list starting just after point.
-With prefix argument indent without offset for second lines."
-  (interactive "P")
-   (let ((lisp-indent-offset (and arg 1)))
-     (indent-sexp)))
+If NO-OFFSET is non-nil (with \\[universal-argument]), indent
+without offset for the following lines.
+If PP is non-nil (with \\[universal-argument] \\[universal-argument]), pretty-print the following list."
+  (interactive
+   (list (equal current-prefix-arg '(4))
+         (equal current-prefix-arg '(16))))
+  (let ((lisp-indent-offset (and no-offset 1)))
+    (indent-pp-sexp pp)))
 
 (provide 'utl-elisp)
 
