@@ -73,21 +73,19 @@ With prefix (if ARG is non-nil), use the next ARG files instead."
 (defun utl-dired-sort-set-mode-line ()
   "Replacement for `dired-sort-set-mode-line'."
   (when (eq major-mode 'dired-mode)
-    (setq mode-name
-	  (let (case-fold-search
-                (switches-name
-                 (cond ((string-match-p
-                         dired-sort-by-name-regexp dired-actual-switches)
-                        "name")
-                       ((string-match-p
-                         dired-sort-by-date-regexp dired-actual-switches)
-                        "date")
-                       (t dired-actual-switches))))
-            (concat "DE[" switches-name "]")))
-    (force-mode-line-update)))
+    (require 'utl-mode-line)
+    (setq utl-mode-info
+	  (let (case-fold-search)
+            (cond ((string-match-p
+                    dired-sort-by-name-regexp dired-actual-switches)
+                   "name")
+                  ((string-match-p
+                    dired-sort-by-date-regexp dired-actual-switches)
+                   "date")
+                  (t dired-actual-switches))))))
 
 (defadvice dired-sort-set-mode-line (around utl-new-mode-name)
-  "Replace the original dired mode names with the 'improved' ones."
+  "Add sorting name to `utl-mode-info' instead of `mode-name'."
   (utl-dired-sort-set-mode-line))
 
 (provide 'utl-dired)
