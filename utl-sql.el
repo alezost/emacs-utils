@@ -19,7 +19,9 @@ Do not prompt for anything else."
     (cl-letf (((symbol-value login-var) nil))
       (sql-product-interactive product))))
 
+
 ;;; Log of sql commands
+
 ;; Idea from <http://www.emacswiki.org/emacs/SqlMode>.  Add to .emacs:
 ;; (add-hook 'sql-interactive-mode-hook 'utl-sql-save-history)
 
@@ -39,6 +41,25 @@ Use `utl-sql-history-dir'."
                                             "-history.sql")
                                     utl-sql-history-dir))
     (error "SQL history will not be saved because sql-product is nil")))
+
+
+;;; Mode line
+
+(defun utl-sql-highlight-product ()
+  "Replacement for `sql-highlight-product'."
+  (when (derived-mode-p 'sql-mode)
+    (set-syntax-table (sql-product-syntax-table))
+    (sql-product-font-lock nil t))
+  (and (or (derived-mode-p 'sql-mode)
+           (derived-mode-p 'sql-interactive-mode))
+       (require 'utl-mode-line nil t)
+       (setq utl-mode-info
+             (or (sql-get-product-feature sql-product :name)
+                 (symbol-name sql-product)))))
+
+(defadvice sql-highlight-product (around utl-new-mode-name)
+  "Add sql product name to `utl-mode-info' instead of `mode-name'."
+  (utl-sql-highlight-product))
 
 (provide 'utl-sql)
 
