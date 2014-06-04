@@ -496,6 +496,20 @@ move to end of next one."
   (interactive)
   (end-of-line (if (= (point) (point-at-eol)) 2 1)))
 
+;;;###autoload
+(defun utl-recenter-top ()
+  "Move current line to the top (+1) of the window."
+  (interactive)
+  (recenter-top-bottom 1))
+
+;;;###autoload
+(defun utl-recenter-end-of-buffer-top ()
+  "Move the last line (-1) of the buffer to the top of the window."
+  (interactive)
+  (end-of-buffer)
+  (recenter-top-bottom 0)
+  (previous-line 2))
+
 (provide 'utl-text)
 
 ;;; utl-text.el ends here
