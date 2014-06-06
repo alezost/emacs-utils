@@ -26,6 +26,19 @@ This function is intended to be used in `after-change-major-mode-hook'."
       (setq mode-name
             (if (functionp name) (funcall name) name)))))
 
+;;;###autoload
+(defun utl-mode-line-default-buffer-identification (mode)
+  "Set `mode-line-buffer-identification' to the default value for MODE.
+Some major modes like to override
+`mode-line-buffer-identification'.  If you want to force a mode
+to use the default value, call this function like this:
+  (utl-mode-line-default-buffer-identification 'Man-mode)
+  (utl-mode-line-default-buffer-identification 'dired-mode)"
+  (let ((hook (intern (concat (symbol-name mode) "-hook"))))
+    (add-hook hook
+              (lambda () (setq mode-line-buffer-identification
+                               (default-value 'mode-line-buffer-identification))))))
+
 
 ;;; Mode line process
 
