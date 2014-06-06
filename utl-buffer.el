@@ -77,12 +77,14 @@ function FUN if it is specified."
       (and fun (funcall fun)))))
 
 ;;;###autoload
-(defun utl-switch-to-characters ()
-  "Switch to the buffer with unicode characters."
-  (interactive)
+(defun utl-switch-to-characters (&optional charset)
+  "Switch to the buffer with unicode characters from CHARSET.
+If CHARSET is nil, use `unicode-bmp'.  With prefix, use `unicode-smp'."
+  (interactive
+   (list (and current-prefix-arg 'unicode-smp)))
   (utl-switch-to-buffer-or-funcall
    "*Character List*"
-   (lambda () (list-charset-chars 'unicode-bmp))))
+   (lambda () (list-charset-chars (or charset 'unicode-bmp)))))
 
 ;;;###autoload
 (defun utl-switch-to-packages ()
