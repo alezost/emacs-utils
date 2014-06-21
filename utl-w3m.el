@@ -82,6 +82,15 @@ Defined function has a name `utl-w3m-TYPE-url'."
                                   (message "Download finished."))))
       (message "Nothing to get."))))
 
+
+
+(defun utl-w3m-switch-to-buffer (arg)
+  "Switch to a w3m buffer number ARG.
+Buffers are enumerated from 1."
+  (interactive "NBuffer number: ")
+  (let ((buf (nth (- arg 1) (w3m-list-buffers))))
+    (and buf (switch-to-buffer buf))))
+
 (provide 'utl-w3m)
 
 ;;; utl-w3m.el ends here
