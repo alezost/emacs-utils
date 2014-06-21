@@ -80,6 +80,23 @@ Example:
                          (bind-key ,key nil ,map))))
                maps)))
 
+
+;;; Binding buffer local keys
+
+;; Idea from <http://www.emacswiki.org/emacs/BufferLocalKeys>
+
+(defvar-local utl-local-map nil
+  "Local keymap used by `utl-bind-local-keys'.")
+
+;;;###autoload
+(defun utl-bind-local-keys (&rest vars)
+  "Bind all keys from variables VARS locally in the current buffer.
+VARS are variables with bindings supported by
+`utl-bind-keys-from-vars'."
+  (setq utl-local-map (copy-keymap (current-local-map)))
+  (use-local-map utl-local-map)
+  (utl-bind-keys-from-vars 'utl-local-map vars t))
+
 (provide 'utl-keys)
 
 ;;; utl-keys.el ends here
