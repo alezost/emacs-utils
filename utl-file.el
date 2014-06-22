@@ -66,6 +66,42 @@ with \\[universal-argument] \\[universal-argument] prompt for a default host as 
       (find-file-noselect (format "/ssh:%s@%s:/" user host))
     (ido-find-file)))
 
+
+;;; Backup
+
+;; Setting `make-backup-file-name-function' is not enough as it is used
+;; by `make-backup-file-name', but not by `find-backup-file-name', so
+;; replace `make-backup-file-name-1' instead.
+
+;;;###autoload
+(defun utl-make-backup-file-name-1 (file)
+  "Return a new backup file path of a given FILE.
+If the new path's directories do not exist, create them.
+This function is intended to be used as a substitution for
+`make-backup-file-name-1'."
+  (let ((alist backup-directory-alist)
+        (file (expand-file-name file))
+	elt backup-directory abs-backup-directory backup-file)
+    (while alist
+      (setq elt (pop alist))
+      (if (string-match (car elt) file)
+	  (setq backup-directory (cdr elt)
+		alist nil)))
+    (if (null backup-directory)
+        (setq backup-file file)
+      (setq backup-file
+            ;; New full path in backup dir tree
+            (concat (directory-file-name (expand-file-name backup-directory))
+                    file)
+            abs-backup-directory (file-name-directory backup-file))
+      (if (and abs-backup-directory
+               (not (file-exists-p abs-backup-directory)))
+          (condition-case nil
+              (make-directory abs-backup-directory 'parents)
+            (file-error (setq backup-directory nil
+                              abs-backup-directory nil)))))
+    backup-file))
+
 (provide 'utl-file)
 
 ;;; utl-file.el ends here
