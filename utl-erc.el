@@ -112,6 +112,28 @@ The function is suitable for `erc-after-connect'."
       (erc-message "PRIVMSG" (format "NickServ IDENTIFY %s %s"
                                      nick-orig password)))))
 
+(defun utl-erc-insert-timestamp (string)
+  "Insert timestamps in the beginning of the line.
+
+This function is suitable for `erc-insert-timestamp-function'.
+It is a sort of combination of `erc-insert-timestamp-left' and
+`erc-insert-timestamp-left-and-right'.  Usual
+timestamps (`erc-timestamp-format') are inserted in the beginning
+of each line and an additional
+timestamp (`erc-timestamp-format-left') is inserted only if it
+was changed since the last time (by default if the date was
+changed)."
+  (goto-char (point-min))
+  (erc-put-text-property 0 (length string) 'field 'erc-timestamp string)
+  (insert string)
+  (let ((stamp (erc-format-timestamp (current-time)
+                                     erc-timestamp-format-left)))
+    (unless (string-equal stamp erc-timestamp-last-inserted-left)
+      (goto-char (point-min))
+      (erc-put-text-property 0 (length stamp) 'field 'erc-timestamp stamp)
+      (insert stamp)
+      (setq erc-timestamp-last-inserted-left stamp))))
+
 
 ;;; Away
 
