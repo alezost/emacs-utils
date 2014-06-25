@@ -60,7 +60,10 @@ as the latter function and also create elements for
 ;; Idea from <https://github.com/jwiegley/use-package/issues/80>.
 
 (defvar utl-imenu-use-package-re
-  "^\\s-*(use-package\\s-+\\(\\(\\sw\\|\\s_\\)+\\)"
+  (rx bol "(use-package" (+ whitespace)
+      (? ?\")
+      (group (+ (or (syntax word) (syntax symbol))))
+      (? ?\"))
   "Regexp used for `use-package' entries in imenu.")
 
 ;;;###autoload
