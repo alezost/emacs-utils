@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'utl-process)
+(require 'utl-mode-line nil t)
 
 (defun utl-dired-start-process (program &optional args)
   "Open current file with a PROGRAM."
@@ -73,7 +74,6 @@ With prefix (if ARG is non-nil), use the next ARG files instead."
 (defun utl-dired-sort-set-mode-line ()
   "Replacement for `dired-sort-set-mode-line'."
   (when (eq major-mode 'dired-mode)
-    (require 'utl-mode-line)
     (setq utl-mode-info
 	  (let (case-fold-search)
             (cond ((string-match-p
@@ -87,6 +87,12 @@ With prefix (if ARG is non-nil), use the next ARG files instead."
 (defadvice dired-sort-set-mode-line (around utl-new-mode-name)
   "Add sorting name to `utl-mode-info' instead of `mode-name'."
   (utl-dired-sort-set-mode-line))
+
+(defadvice wdired-change-to-dired-mode (after utl-mode-name)
+  "Use customized `mode-name' after exit from the `wdired-mode'."
+  ;; `mode-name' is hardcoded to \"Dired\" in
+  ;; `wdired-change-to-dired-mode' as well as in `dired-mode'.
+  (utl-mode-name))
 
 (provide 'utl-dired)
 
