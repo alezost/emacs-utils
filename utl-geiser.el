@@ -32,6 +32,19 @@ Substitution for `geiser-repl--maybe-send'."
   (kill-region (comint-line-beginning-position)
                (progn (forward-line arg) (point))))
 
+(defun utl-geiser-doc-doc-symbol-at-point ()
+  "Open documentation for symbol at point.
+This function refers to `geiser-doc-symbol-at-point' as
+`geiser-doc-edit-symbol-at-point' refers to
+`geiser-edit-symbol-at-point'."
+  (interactive)
+  (let* ((impl (geiser-doc--implementation))
+         (module (geiser-doc--module)))
+    (unless (and impl module)
+      (error "I don't know what module this buffer refers to."))
+    (with--geiser-implementation impl
+      (geiser-doc-symbol-at-point))))
+
 (provide 'utl-geiser)
 
 ;;; utl-geiser.el ends here
