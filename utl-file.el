@@ -102,6 +102,14 @@ This function is intended to be used as a substitution for
                               abs-backup-directory nil)))))
     backup-file))
 
+(defun utl-backup-enable-predicate (name)
+  "Function for `backup-enable-predicate'.
+Do not backup su/sudo files."
+  (and (normal-backup-enable-predicate name)
+       (not (let ((method (file-remote-p name 'method)))
+              (when (stringp method)
+                (member method '("su" "sudo")))))))
+
 (provide 'utl-file)
 
 ;;; utl-file.el ends here
