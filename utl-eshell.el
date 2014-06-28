@@ -47,6 +47,26 @@ ARG has the same meaning as in `eshell'"
           (utl-with-face (if (= (user-uid) 0) "#" "$")
                         'comint-highlight-prompt)))
 
+(defun utl-eshell-previous-matching-input-from-input (arg)
+  "Search backwards through input history for match for current input.
+Similar to `eshell-previous-matching-input-from-input' but better."
+  (interactive "p")
+  (if (not (memq last-command '(utl-eshell-previous-matching-input-from-input
+				utl-eshell-next-matching-input-from-input)))
+      ;; Starting a new search
+      (setq eshell-matching-input-from-input-string
+	    (buffer-substring (save-excursion (eshell-bol) (point))
+			      (point))
+	    eshell-history-index nil))
+  (eshell-previous-matching-input
+   (regexp-quote eshell-matching-input-from-input-string)
+   arg))
+
+(defun utl-eshell-next-matching-input-from-input (arg)
+  "Search forwards through input history for match for current input."
+  (interactive "p")
+  (utl-eshell-previous-matching-input-from-input (- arg)))
+
 (provide 'utl-eshell)
 
 ;;; utl-eshell.el ends here
