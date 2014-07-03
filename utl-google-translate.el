@@ -5,8 +5,12 @@
 
 ;;; Code:
 
-(require 'google-translate)
+(require 'google-translate-default-ui)
+(require 'google-translate-smooth-ui)
 (require 'utl-misc)
+
+
+;;; Default UI
 
 (defun utl-%google-translate (override-p reverse-p)
   "Translate region or prompting text.
@@ -46,6 +50,45 @@ For details look at `google-translate-query-translate'."
 For details look at `google-translate-query-translate'."
   (interactive)
   (utl-%google-translate nil t))
+
+
+;;; Smooth UI
+
+;;;###autoload
+(defun utl-google-translate-smooth-translate ()
+  "Translate a text using translation directions.
+Similar to `google-translate-smooth-translate', but prompt for
+languages (if needed) before text."
+  (interactive)
+  (setq google-translate-translation-direction-query
+        (when (use-region-p)
+          (google-translate--strip-string
+           (buffer-substring-no-properties
+            (region-beginning) (region-end)))))
+  (let ((google-translate-translation-directions-alist
+         google-translate-translation-directions-alist)
+        (google-translate-current-translation-direction
+         google-translate-current-translation-direction))
+    (unless google-translate-translation-directions-alist
+      (let ((source (google-translate-read-source-language))
+            (target (google-translate-read-target-language)))
+        (setq google-translate-current-translation-direction 0
+              google-translate-translation-directions-alist
+              (list (cons source target)
+                    (cons target source)))))
+    (let ((text (google-translate-query-translate-using-directions)))
+      (google-translate-translate
+       (google-translate--current-direction-source-language)
+       (google-translate--current-direction-target-language)
+       text))))
+
+;;;###autoload
+(defun utl-google-translate-using-languages (source target)
+  "Translate a text using SOURCE and TARGET languages."
+  (let ((google-translate-translation-directions-alist
+         (list (cons source target)
+               (cons target source))))
+    (utl-google-translate-smooth-translate)))
 
 (provide 'utl-google-translate)
 
