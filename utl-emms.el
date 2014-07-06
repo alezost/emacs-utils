@@ -96,7 +96,7 @@ Intended to be used for `emms-track-description-function'."
         title
       (let ((type (emms-track-type track)))
         (cond ((eq 'file type)
-               (file-name-directory (emms-track-name track)))
+               (file-name-nondirectory (emms-track-name track)))
               ((eq 'url type)
                (url-file-nondirectory (emms-format-url-track-name
                                        (emms-track-name track))))
