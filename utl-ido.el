@@ -40,9 +40,9 @@ It is run by `ido-common-initialization', which is run by `ido-mode'.")
 
 ;;; Use ido everywhere
 
-;; Got from <http://www.emacswiki.org/emacs/InteractivelyDoThings#toc15>.
+;; Idea from <http://www.emacswiki.org/emacs/InteractivelyDoThings#toc15>.
 ;; To activate the following code, add to .emacs:
-;;   (ad-activate 'completing-read)
+;;   (setq completing-read-function 'utl-completing-read)
 ;;   (ad-activate 'read-file-name-default)
 
 (defvar utl-ido-enable-replace-completing-read t
@@ -56,21 +56,22 @@ advice like this:
   (defadvice foo (around original-completing-read activate)
     (let (utl-ido-enable-replace-completing-read) ad-do-it))")
 
-(defadvice completing-read (around utl-use-ido-completing-read)
-  "Replace `completing-read' with `ido-completing-read' anywhere.
-See also `utl-ido-enable-replace-completing-read'."
-  (if (or (null utl-ido-enable-replace-completing-read)
-          (and (boundp 'ido-cur-list)
-               ido-cur-list)) ; Avoid infinite loop from ido calling this
-      ad-do-it
-    (let ((allcomp (all-completions "" collection predicate)))
-      (if allcomp
-          (setq ad-return-value
-                ;; match is never required because with requiring it's
-                ;; not possible to select "#XXXXXX" with `read-color'
-                (ido-completing-read
-                 prompt allcomp nil nil initial-input hist def))
-        ad-do-it))))
+(defun utl-completing-read (prompt collection &optional predicate
+                                   require-match initial-input
+                                   hist def inherit-input-method)
+  "Function for `completing-read-function' variable.
+Use `ido-completing-read' if possible."
+  (let (choices)
+    (if (and utl-ido-enable-replace-completing-read
+             (not (eq ido-exit 'fallback))
+             (setq choices (all-completions "" collection predicate)))
+        ;; Match is never required because with requiring it's
+        ;; not possible to select "#XXXXXX" with `read-color'
+        (ido-completing-read prompt choices nil nil
+                             initial-input hist def)
+      (completing-read-default prompt collection predicate
+                               require-match initial-input
+                               hist def inherit-input-method))))
 
 (defadvice read-file-name-default (around utl-original-completing-read)
   "Roll back from `ido-completing-read' to `completing-read'."
