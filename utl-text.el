@@ -490,6 +490,95 @@ the word.  It should accept a number of modified words as argument."
 
 ;;; Moving
 
+;; The idea of `utl-beginning-of-code-or-line' and
+;; `utl-end-of-code-or-line' came from
+;; <http://www.emacswiki.org/emacs-en/BackToIndentationOrBeginning>.
+
+(defmacro utl-point-at (&rest body)
+  "Return point after evaluating BODY in `save-excursion'."
+  `(save-excursion ,@body (point)))
+
+(defmacro utl-goto-non-current-char (exp1 exp2)
+  "Move point to position defined after evaluating EXP1.
+If the point is already there, move to position defined after
+evaluating EXP2."
+  `(goto-char
+    (let ((p1 (utl-point-at ,exp1)))
+      (if (= (point) p1)
+          (utl-point-at ,exp2)
+        p1))))
+
+(defun utl-line-commented-p ()
+  "Return non-nil, if the current line is commented."
+  (comment-only-p (line-beginning-position)
+                  (line-end-position)))
+
+(defun utl-point-in-comment-p ()
+  "Return non-nil, if the point is inside a comment"
+  (interactive)
+  (let ((syn (syntax-ppss)))
+    (and (nth 8 syn)
+         (not (nth 3 syn)))))
+
+(defun utl-beginning-of-code ()
+  "Move point to the first non-whitespace character on current line."
+  (interactive)
+  (beginning-of-visual-line)
+  (skip-syntax-forward " " (line-end-position)))
+
+(defun utl-end-of-code ()
+  "Move point to the end of code.
+
+'end of code' means before a possible comment.  Comments are
+recognized in any mode that sets `syntax-ppss' properly.
+
+If current line is fully commented (contains only comment), move
+to the end of current visual line."
+  (interactive)
+  (end-of-visual-line)
+  (unless (utl-line-commented-p)
+    (while (utl-point-in-comment-p)
+      (backward-char))
+    (skip-chars-backward " \t")))
+
+;;;###autoload
+(defun utl-beginning-of-code-or-line ()
+  "Move point to the beginning of code.
+If the point is already there, move to the beginning of current
+visual line."
+  (interactive)
+  (utl-goto-non-current-char
+   (utl-beginning-of-code)
+   (beginning-of-visual-line)))
+
+;;;###autoload
+(defun utl-beginning-of-line-or-code ()
+  "Move point to the beginning of line.
+If the point is already there, move to the beginning of code."
+  (interactive)
+  (utl-goto-non-current-char
+   (beginning-of-visual-line)
+   (utl-beginning-of-code)))
+
+;;;###autoload
+(defun utl-end-of-code-or-line ()
+  "Move point to the end of code.
+If the point is already there, move to the end of current visual
+line."
+  (interactive)
+  (utl-goto-non-current-char
+   (utl-end-of-code)
+   (end-of-visual-line)))
+
+;;;###autoload
+(defun utl-end-of-line-or-code ()
+  "Move point to the end of line.
+If the point is already there, move to the end of code."
+  (interactive)
+  (utl-goto-non-current-char
+   (end-of-visual-line)
+   (utl-end-of-code)))
+
 ;;;###autoload
 (defun utl-beginning-of-line ()
   "Move point to beginning of current line.
