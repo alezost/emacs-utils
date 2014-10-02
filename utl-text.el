@@ -48,10 +48,20 @@
   (interactive "P")
   (insert-pair arg ?\' ?\'))
 ;;;###autoload
+(defun utl-insert-left-right-single-quotation (&optional arg)
+  "Similar to `insert-parentheses', except it inserts ‘’."
+  (interactive "P")
+  (insert-pair arg ?\‘ ?\’))
+;;;###autoload
 (defun utl-insert-double-quotation (&optional arg)
   "Similar to `insert-parentheses', except it inserts \"\"."
   (interactive "P")
   (insert-pair arg ?\" ?\"))
+;;;###autoload
+(defun utl-insert-left-right-double-quotation (&optional arg)
+  "Similar to `insert-parentheses', except it inserts “”."
+  (interactive "P")
+  (insert-pair arg ?\“ ?\”))
 ;;;###autoload
 (defun utl-insert-grave-quotation (&optional arg)
   "Similar to `insert-parentheses', except it inserts `'."
