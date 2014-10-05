@@ -18,6 +18,17 @@ Return nil, if there is no such live buffer."
       (if (string-match-p regexp (buffer-name buffer))
           (setq buffers (cons buffer buffers))))))
 
+;;;###autoload
+(defun utl-buffer-file-name (&optional buffer)
+  "Return file name without extension for BUFFER.
+If BUFFER is nil, use the current buffer.
+If BUFFER is not visiting a file, return BUFFER name."
+  (let ((file (buffer-file-name buffer)))
+    (file-name-sans-extension
+     (if file
+         (file-name-nondirectory file)
+       (buffer-name buffer)))))
+
 
 ;;; Putting buffer info into kill ring
 
