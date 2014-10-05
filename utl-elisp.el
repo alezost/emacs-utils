@@ -5,6 +5,16 @@
 
 ;;; Code:
 
+(require 'pp)
+
+;;;###autoload
+(defun utl-pp-eval-expression (expression)
+  "Same as `pp-eval-expression' but without \"Evaluating...\" message."
+  (interactive
+   (list (read--expression "Eval: ")))
+  (setq values (cons (eval expression) values))
+  (pp-display-expression (car values) "*Pp Eval Output*"))
+
 ;;;###autoload
 (defun utl-eval-dwim (arg)
   "Eval last sexp or region if it is active.
@@ -12,7 +22,7 @@ ARG is passed to `eval-last-sexp'."
   (interactive "P")
   (if (use-region-p)
       (eval-region (region-beginning) (region-end))
-    (eval-last-sexp arg)))
+    (pp-eval-last-sexp arg)))
 
 ;; from <http://www.emacswiki.org/emacs/ElDoc>
 ;;;###autoload
