@@ -54,6 +54,14 @@ some inner mode line variable.")
   (server-start leave-dead inhibit-prompt)
   (setq utl-server-is-running (not leave-dead)))
 
+;;;###autoload
+(defun utl-server-running-p (&optional name)
+  "Test whether server NAME is running.
+Similar to `server-running-p' but check `utl-server-is-running'
+instead of a real testing."
+  (and (string= server-name (or name "server"))
+       utl-server-is-running))
+
 (provide 'utl-server)
 
 ;;; utl-server.el ends here
