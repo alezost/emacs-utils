@@ -87,10 +87,11 @@ row."
 ;; (eval-after-load 'org '(org-add-link-type "emms" 'utl-org-emms-open))
 ;; (add-hook 'org-store-link-functions 'utl-org-emms-store-link)
 
-(defcustom utl-org-emms-sleep 5
-  "Time in seconds after starting to play url before seeking to time."
-  :type 'integer
-  :group 'emacs-utils)
+(defvar utl-org-emms-file-sleep 3
+  "Time in seconds after starting to play file before seeking to time.")
+
+(defvar utl-org-emms-url-sleep 7
+  "Time in seconds after starting to play url before seeking to time.")
 
 ;;;###autoload
 (defun utl-org-emms-open (link)
@@ -112,8 +113,9 @@ row."
       (if (string-match "^\\(ftp\\|https?\\)://" path)
           (progn (emms-play-url path)
                  ;; we need to wait while the backend will start to play
-                 (and sec (sleep-for utl-org-emms-sleep)))
-        (emms-play-file path)))
+                 (and sec (sleep-for utl-org-emms-url-sleep)))
+        (emms-play-file path)
+        (and sec (sleep-for utl-org-emms-file-sleep))))
     (and sec (emms-seek-to sec))))
 
 ;;;###autoload
