@@ -97,22 +97,32 @@ Used in `utl-gnus-summary-get-mm-url'.")
   (interactive)
   (emms-play-url (utl-gnus-summary-get-mm-url)))
 
-(defun utl-gnus-summary-get-mm-url ()
-  "Return the first link to multimedia url from the gnus article.
-Matching url is defined by `utl-gnus-mm-url-re'."
+(defun utl-gnus-summary-get-url (regexp &optional group)
+  "Return the first URL from the gnus article matching REGEXP.
+If GROUP is non-nil, it should be a number specifying a
+parenthesized expression from REGEXP that should be returned."
   (let ((article (gnus-summary-article-number)))
     (or article
         (error "No article to select"))
     (gnus-configure-windows 'article)
-    ;; selected subject is different from current article's
+    ;; Selected subject is different from the current article's subject.
     (if (or (null gnus-current-article)
 	    (null gnus-article-current)
 	    (/= article (cdr gnus-article-current))
 	    (not (equal (car gnus-article-current) gnus-newsgroup-name)))
         (gnus-summary-display-article article))
-    (gnus-eval-in-buffer-window gnus-article-buffer
-      (goto-char (point-min))
-      (utl-widget-find-url utl-gnus-mm-url-re))))
+    (let ((url (gnus-eval-in-buffer-window gnus-article-buffer
+                 (goto-char (point-min))
+                 (utl-widget-find-url regexp))))
+      (if (null group)
+          url
+        (string-match regexp url)
+        (match-string group url)))))
+
+(defun utl-gnus-summary-get-mm-url ()
+  "Return the first link to multimedia url from the gnus article.
+Matching url is defined by `utl-gnus-mm-url-re'."
+  (utl-gnus-summary-get-url utl-gnus-mm-url-re))
 
 (defun utl-widget-find-url (re)
   "Return the first widget-url matching regexp RE from point.
