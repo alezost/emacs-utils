@@ -7,6 +7,28 @@
 
 (require 'browse-url)
 
+
+;;; Browse IRC logs from gnunet.
+
+(defvar utl-irc-log-base-url "https://gnunet.org/bot/log/"
+  "Base URL with IRC logs.")
+
+(defvar utl-irc-log-channels '("guix" "guile" "gnunet")
+  "List of channels that are logged by gnunet bot.")
+
+(declare-function url-expand-file-name "url-expand" t)
+(declare-function org-read-date "org" t)
+
+;;;###autoload
+(defun utl-browse-irc-log (channel &optional date)
+  "Browse IRC log of the CHANNEL from DATE."
+  (interactive
+   (list (completing-read "IRC channel: " utl-irc-log-channels nil t)
+         (org-read-date nil nil nil "Log date: ")))
+  (browse-url (url-expand-file-name (concat channel "/" date)
+                                    utl-irc-log-base-url)))
+
+
 ;;; Add support for the Conkeror browser.
 
 (defcustom utl-browse-url-conkeror-program "conkeror"
