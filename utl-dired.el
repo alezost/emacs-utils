@@ -94,6 +94,16 @@ With prefix (if ARG is non-nil), use the next ARG files instead."
   ;; `wdired-change-to-dired-mode' as well as in `dired-mode'.
   (utl-mode-name))
 
+(defun utl-dired-mark-read-file-name (prompt dir op-symbol arg files &optional default)
+  "Replacement for `dired-mark-read-file-name'.
+Use default destination file in a prompt instead of a destination
+directory."
+  (dired-mark-pop-up
+   nil op-symbol files
+   (function read-file-name)
+   (format prompt (dired-mark-prompt arg files))
+   (or default dir) default))
+
 (provide 'utl-dired)
 
 ;;; utl-dired.el ends here
