@@ -8,27 +8,22 @@
 (require 'emms)
 
 (defvar utl-emms-seek-seconds 60
-  "The number of seconds to seek forward or backward for
-\"custom\" seeking.")
+  "The number of seconds to seek forward or backward.
+Used as a default value by `utl-emms-seek-forward' and
+`utl-emms-seek-backward'.")
 
 (defun utl-emms-seek-forward (&optional seconds)
   "Seek by SECONDS forward.
-If SECONDS is nil, use `emms-big-seek-seconds'.
-Interactively with prefix, prompt for SECONDS."
-  (interactive
-   (list (if current-prefix-arg
-             (read-number "Seek forward by (seconds): ")
-           nil)))
+If SECONDS is nil, use `utl-emms-seek-seconds'.
+Interactively, define SECONDS with a numeric prefix."
+  (interactive "p")
   (when emms-player-playing-p
     (emms-player-seek (or seconds utl-emms-seek-seconds))))
 
 (defun utl-emms-seek-backward (&optional seconds)
   "Seek by SECONDS backward.
 See `utl-emms-seek-forward' for details."
-  (interactive
-   (list (if current-prefix-arg
-             (read-number "Seek backward by (seconds): ")
-           nil)))
+  (interactive "p")
   (utl-emms-seek-forward (- (or seconds utl-emms-seek-seconds))))
 
 (defun utl-emms-seek-to (seconds)
@@ -41,23 +36,12 @@ With prefix, prompt for the number of seconds."
            (* 60 (read-number "Minutes to seek to: ")))))
   (emms-seek-to seconds))
 
-;;;###autoload
-(defun utl-emms-add-url (url)
-  "Add url or a list of urls to emms playlist."
+(defun utl-emms-source-add-and-play (source &rest args)
+  "Add the tracks of SOURCE to EMMS playlist and play the first one."
   (with-current-emms-playlist
-    ;; use `emms-sourse-add' instead of `emms-add-url' because
-    ;; the last one runs `emms-play-url' if prefix is specified
-    (if (listp url)
-        (dolist (u url)
-          (emms-source-add 'emms-source-url u))
-      (emms-source-add 'emms-source-url url))))
-
-;;;###autoload
-(defun utl-emms-add-and-play-url (url)
-  "Add url or a list of urls to emms playlist and play the first added track."
-  (with-current-emms-playlist
-    (let ((first-new-track (point-max)))
-      (utl-emms-add-url url)
+    (goto-char (point-max))
+    (let ((first-new-track (point)))
+      (apply #'emms-playlist-insert-source source args)
       (emms-playlist-select first-new-track)))
   (emms-stop)
   (emms-start))
@@ -106,6 +90,9 @@ Intended to be used for `emms-track-description-function'."
 
 ;;; Mode line
 
+(require 'emms-mode-line)
+(require 'emms-playing-time)
+
 (defvar utl-emms-state-mode-line-string
   '(emms-player-playing-p (emms-player-paused-p "⏸" "⏵") "⏹")
   "Mode line string displaying the state of the current EMMS process.")
@@ -127,8 +114,6 @@ Use a single variable `utl-emms-mode-line-string' instead of
 adding `emms-mode-line-string' and `emms-playing-time-string' to
 the `global-mode-string'."
   (interactive "p")
-  (require 'emms-mode-line)
-  (require 'emms-playing-time)
   (or global-mode-string (setq global-mode-string '("")))
   (let (hook-action activep)
     (if (and arg (> arg 0))
