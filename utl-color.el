@@ -13,16 +13,16 @@
 
 ;;;###autoload
 (defun utl-load-theme (theme)
-  "Similar to `load-theme' except unload current theme first."
+  "Similar to `load-theme' except unload the current theme at first."
   (interactive
    (list (intern (completing-read
                   "Load custom theme: "
-                  (mapcar 'symbol-name (custom-available-themes))))))
+                  (mapcar #'symbol-name (custom-available-themes))))))
   (utl-unload-current-theme)
   (load-theme theme t)
-  (setq utl-current-theme theme))
+  (setq utl-current-theme theme)
+  (message "Current theme: '%S'." utl-current-theme))
 
-;;;###autoload
 (defun utl-unload-current-theme ()
   "Unload currently used theme."
   (interactive)
@@ -30,14 +30,15 @@
     (disable-theme utl-current-theme)
     (setq utl-current-theme nil)))
 
-;; idea from <https://gist.github.com/joehakimrahme/6305195>
+;; Idea from <https://gist.github.com/joehakimrahme/6305195>.
 ;;;###autoload
 (defun utl-load-random-theme ()
   "Load any random theme from the available ones."
   (interactive)
-  (let ((themes-list (custom-available-themes)))
-    (utl-load-theme (nth (random (length themes-list))
-                         themes-list))))
+  (let ((themes (custom-available-themes)))
+    (utl-load-theme (nth (random (length themes))
+                         themes))))
+
 
 ;;; Working with faces
 
