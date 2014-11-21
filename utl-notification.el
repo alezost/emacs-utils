@@ -6,9 +6,10 @@
 ;;; Code:
 
 (require 'timer)
+(require 'notifications)
 
 
-;;; Playing audio-file
+;;; Playing sounds
 
 (defvar utl-sound-file nil
   "Default sound file for `utl-play-sound'.")
@@ -22,7 +23,6 @@ If nil, use `play-sound-file'.")
   "List of default arguments for `utl-sound-program'.")
 
 (declare-function utl-start-process "utl-process" (program &rest args))
-(declare-function alert "alert" t)
 
 ;;;###autoload
 (defun utl-play-sound (&optional file)
@@ -30,9 +30,11 @@ If nil, use `play-sound-file'.")
 If FILE is nil, use `utl-sound-file'."
   (or file (setq file utl-sound-file))
   (if utl-sound-program
-      (apply 'utl-start-process
-             utl-sound-program
-             (append utl-sound-args (list file)))
+      (progn
+        (require 'utl-process)
+        (apply #'utl-start-process
+               utl-sound-program
+               (append utl-sound-args (list file))))
     (play-sound-file file)))
 
 
@@ -59,7 +61,7 @@ With prefix, prompt for the number of seconds."
         (run-at-time seconds nil
                      (lambda (msg)
                        (utl-play-sound)
-                       (alert msg :title "Timer"))
+                       (notifications-notify :title "Timer" :body msg))
                      msg))
   (message "The timer has been set on %s."
            (format-time-string "%T" (timer--time utl-timer))))
@@ -84,7 +86,6 @@ Return nil if `utl-timer' is not a proper timer."
   (and (timerp utl-timer)
        (- (timer-until utl-timer (current-time)))))
 
-;;;###autoload
 (defun utl-timer-remaining-time ()
   "Show the time left until the deadline of `utl-timer'."
   (interactive)
