@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'browse-url)
+(require 'cl-lib)
 
 
 ;;; Browse IRC logs from gnunet.
@@ -58,9 +59,14 @@ Conkeror."
 	    (list url)))))
 
 
+;;; Choosing a browser
+
+;; I use the following to be prompted for a browser before opening an URL:
+;;
+;;   (setq browse-url-browser-function 'utl-choose-browser)
 
 (defvar utl-browser-choices
-  '((?c "conkeror" utl-browse-url-conkeror)
+  '(((?c ?\C-m) "conkeror" utl-browse-url-conkeror)
     (?f "firefox" browse-url-firefox)
     (?w "w3m" w3m-browse-url)
     (?e "eww" eww))
@@ -69,7 +75,7 @@ Each choice has a form:
 
   (CHAR NAME FUN)
 
-CHAR is a pressed character.
+CHAR is a character or a list of characters that can be pressed.
 NAME is a name of the browser.
 FUN is a function to call for browsing (should take URL as an argument).
 
@@ -81,25 +87,44 @@ first function).")
   "Choose a browser for openning URL.
 Suitable for `browse-url-browser-function'."
   (interactive "sURL: ")
-  (let* ((chars (mapcar 'car utl-browser-choices))
-         (choices-str (mapconcat
-                       (lambda (assoc)
-                         (format "%c (%s)" (car assoc) (cadr assoc)))
-                       utl-browser-choices
-                       ", "))
-         (choice (read-char
-                  (format "Choose a browser for '%s'\n%s: "
-                          url choices-str)))
-         (fun (cond
-               ((member choice chars)
-                (car (last (assoc choice utl-browser-choices))))
-               ;; RET can be in `utl-browser-choices', so check it after
-               ;; the members.
-               ((= choice 13)
-                (car (last (car utl-browser-choices))))
-               (t (user-error "Wrong answer, press: RET (default), %s"
-                              choices-str)))))
-    (funcall fun url)))
+  (let* ((choices (mapcar
+                   (lambda (spec)
+                     (let* ((chars (car spec))
+                            (chars (if (listp chars) chars (list chars)))
+                            (name (cadr spec)))
+                       (list chars name)))
+                   utl-browser-choices))
+         (chars (cons ?\C-g
+                      (apply #'append (mapcar #'car choices))))
+         (str (mapconcat
+               (lambda (spec)
+                 (let ((chars (car spec))
+                       (name  (cadr spec)))
+                   (format "%s (%s)"
+                           (mapconcat
+                            (lambda (char)
+                              (propertize (string char)
+                                          'face 'font-lock-warning-face))
+                            chars
+                            "/")
+                           name)))
+               choices
+               ", "))
+         (char (read-char-choice
+                (concat (propertize "Choose a browser for '"
+                                    'face 'default)
+                        url "'\n" str ": ")
+                chars t)))
+    (unless (eq char ?\C-g)
+      (funcall (nth 2 (cl-find-if
+                       (lambda (spec)
+                         (let ((chars (car spec)))
+                           (if (listp chars)
+                               (memq char chars)
+                             (eq char chars))))
+                       utl-browser-choices))
+               url))
+    (message "")))
 
 (provide 'utl-browse-url)
 
