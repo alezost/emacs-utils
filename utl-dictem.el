@@ -8,24 +8,21 @@
 (require 'dictem)
 (require 'utl-misc)
 
-(defadvice dictem (around utl-same-window)
-  "Do not use other window for dictem buffers."
-  ;; original `dictem' code but with `switch-to-buffer'
+(defun utl-dictem ()
+  "Same as `dictem' but do not use other window for a dictem buffer."
   (let ((buffer (generate-new-buffer dictem-buffer-name))
 	(window-configuration (current-window-configuration))
 	(selected-window (frame-selected-window)))
-    (switch-to-buffer buffer)  ; not `switch-to-buffer-other-window'
+    (switch-to-buffer buffer)      ; not `switch-to-buffer-other-window'
     (dictem-mode)
-
     (make-local-variable 'dictem-window-configuration)
     (make-local-variable 'dictem-selected-window)
     (make-local-variable 'dictem-content-history)
     (setq dictem-window-configuration window-configuration)
     (setq dictem-selected-window selected-window)))
 
-(defadvice dictem-define-on-press (around utl-search-all-dicts)
-  "Always use all dictionaries."
-  ;; original `dictem-define-on-press' code but with "*" for dicts
+(defun utl-dictem-define-on-press ()
+  "Same as `dictem-define-on-press' but with \"*\" for dicts."
   (interactive)
   (let* ((properties (text-properties-at (point)))
 	 (data (plist-get properties 'link-data))
