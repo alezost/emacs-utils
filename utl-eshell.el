@@ -22,6 +22,26 @@ ARG has the same meaning as in `eshell'"
     (eshell arg)
     (eshell/cd dir)))
 
+(defun utl-eshell/info (&rest args)
+  "Run `info' command on NAME.
+NAME is the car of ARGS.
+
+This function is intended to be used as a substitution for
+`eshell/info'.  It does the following:
+
+  info       =>  go to top info window;
+  info NAME  =>  if NAME is a file '*.info', visit it;
+  info NAME  =>  otherwise go to top info node and then menu item NAME."
+  (require 'info)
+  (let* ((name (car args))
+         (file (and (stringp name)
+                    (string-match "\\.info\\'" name)
+                    (expand-file-name name))))
+    (if (and file (file-exists-p file))
+        (Info-find-node file "Top")
+      (Info-directory)
+      (Info-menu name))))
+
 
 ;;; Eshell prompt
 ;; idea from <http://www.emacswiki.org/emacs/EshellPrompt>
