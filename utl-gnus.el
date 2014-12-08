@@ -198,8 +198,9 @@ Matching url is defined by `utl-gnus-mm-url-re'."
 
 ;;; Convert Atom to RSS
 
-;; The defadvice from <http://www.emacswiki.org/emacs/GnusRss>;
-;; "atom2rss.xsl" from <http://atom.geekhood.net/>.
+;; The code for `utl-convert-atom-to-rss' is taken from a defadvice from
+;; <http://www.emacswiki.org/emacs/GnusRss>.  The original
+;; "atom2rss.xsl" is taken from <http://atom.geekhood.net/>.
 
 ;; Github private feed (with info from <https://github.com>) is an Atom,
 ;; so we need to convert it to use with gnus.  There is a little
@@ -219,8 +220,12 @@ Matching url is defined by `utl-gnus-mm-url-re'."
   (expand-file-name "atom2rss.xsl" user-emacs-directory)
   "Path to \"atom2rss.xsl\" file for converting Atom to RSS.")
 
-(defadvice mm-url-insert (after convert-atom-to-rss)
-  "Convert Atom to RSS (if needed) by calling xsltproc."
+(defun utl-convert-atom-to-rss (&rest _)
+  "Convert Atom to RSS (if needed) by calling xsltproc.
+This function is intendend to be used as an 'after' advice for
+`mm-url-insert', i.e.:
+
+  (advice-add 'mm-url-insert :after #'utl-convert-atom-to-rss)"
   (when (re-search-forward "xmlns=\"http://www.w3.org/.*/Atom\""
 			   nil t)
     (goto-char (point-min))
@@ -245,15 +250,21 @@ Used by `utl-change-mode-string' advice for
 Used by `utl-change-mode-string' advice for
 `gnus-agent-make-mode-line-string'.")
 
-(defadvice gnus-agent-make-mode-line-string
-  (before utl-change-mode-string (string mouse-button mouse-func))
-  "Modify \"Plugged\"/\"Unplugged\" mode-line string.
-Use `utl-gnus-plugged' and `utl-gnus-unplugged' variables."
+(defun utl-gnus-plugged-status (string)
+  "Return `utl-gnus-plugged' or `utl-gnus-unplugged' depending on STRING."
   (cond
-   ((string= string " Plugged")
-    (ad-set-arg 0 utl-gnus-plugged))
-   ((string= string " Unplugged")
-    (ad-set-arg 0 utl-gnus-unplugged))))
+   ((string= string " Plugged") utl-gnus-plugged)
+   ((string= string " Unplugged") utl-gnus-unplugged)
+   (t " unknown")))
+
+(defun utl-gnus-agent-mode-line-string (fun string &rest args)
+  "Modify \"Plugged\"/\"Unplugged\" mode-line string.
+This function is intendend to be used as an 'around' advice for
+`gnus-agent-make-mode-line-string', i.e.:
+
+  (advice-add 'gnus-agent-make-mode-line-string
+              :around #'utl-gnus-agent-mode-line-string)"
+  (apply fun (utl-gnus-plugged-status string) args))
 
 (provide 'utl-gnus)
 
