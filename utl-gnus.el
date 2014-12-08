@@ -38,20 +38,20 @@ Gnus buffer is selected using IDO."
 
 
 ;;; Switching gnus and non-gnus window configurations
-;; idea from <http://www.emacswiki.org/emacs/SwitchToGnus>
+
+;; Idea from <http://www.emacswiki.org/emacs/SwitchToGnus>.
 
 (defvar utl-gnus-win-config nil
-  "Window configuration of gnus buffers.")
-(defvar utl-non-gnus-win-config nil
-  "Window configuration of non-gnus buffers.")
+  "Window configuration with gnus buffers.")
 
-(defun utl-gnus-get-win-config-var (&optional revert)
+(defvar utl-non-gnus-win-config nil
+  "Window configuration with non-gnus buffers.")
+
+(defun utl-gnus-win-config-variable (&optional revert)
   "Return a name of variable with window configuration.
-If REVERT is nil:
-  if current buffer is a gnus buffer, return `utl-gnus-win-config',
-  otherwise return `utl-non-gnus-win-config'.
-If REVERT is non-nil, do vice versa."
-  ;; i like exquisiteness
+Return `utl-gnus-win-config' if current buffer is a gnus buffer,
+return `utl-non-gnus-win-config' otherwise.
+If REVERT is non-nil, do vice versa (return the other variable)."
   (if (utl-xor (utl-gnus-buffer-p) revert)
       'utl-gnus-win-config
     'utl-non-gnus-win-config))
@@ -59,18 +59,18 @@ If REVERT is non-nil, do vice versa."
 (defun utl-gnus-save-win-config ()
   "Save current gnus or non-gnus window configuration."
   (interactive)
-  (set (utl-gnus-get-win-config-var)
+  (set (utl-gnus-win-config-variable)
        (current-window-configuration)))
 
 ;;;###autoload
-(defun utl-gnus-switch-win-config (&optional arg)
-  "Switch between gnus and non-gnus buffers, preserving window configurations.
-With ARG refresh window configuration and start gnus again."
-  (interactive "P")
+(defun utl-gnus-switch-win-config ()
+  "Switch window configuration between gnus and non-gnus buffers.
+Start Gnus if needed."
+  (interactive)
   (utl-gnus-save-win-config)
-  (if (and (gnus-alive-p)
-           (null arg))
-      (set-window-configuration (eval (utl-gnus-get-win-config-var 'other)))
+  (if (gnus-alive-p)
+      (set-window-configuration
+       (symbol-value (utl-gnus-win-config-variable 'other)))
     (gnus)
     (utl-gnus-save-win-config)))
 
