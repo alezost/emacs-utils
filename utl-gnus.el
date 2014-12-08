@@ -9,15 +9,9 @@
 (require 'gnus-sum)
 (require 'utl-misc)  ; for utl-xor
 
-(defadvice smtpmail-via-smtp (around prompt-for-password)
-  "Prompt for password before sending.
-Look also at `auth-source-forget-all-cached' if you wrote the wrong password."
-  (let ((ask-for-password t))
-    ad-do-it))
-
 (defun utl-gnus-buffer-names ()
   "Return a list of names of live gnus buffer."
-  (mapcar 'buffer-name (gnus-buffers)))
+  (mapcar #'buffer-name (gnus-buffers)))
 
 (defun utl-gnus-buffer-p ()
   "Return nil if current buffer is not a gnus buffer."
@@ -39,7 +33,7 @@ Gnus buffer is selected using IDO."
   (interactive)
   (let ((gnus-bufs (utl-gnus-buffer-names)))
     (if gnus-bufs
-     	(switch-to-buffer (ido-completing-read "Gnus buffer: " gnus-bufs))
+     	(switch-to-buffer (completing-read "Gnus buffer: " gnus-bufs))
       (gnus))))
 
 
