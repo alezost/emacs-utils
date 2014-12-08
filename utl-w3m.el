@@ -7,6 +7,7 @@
 
 (require 'cl-lib)
 (require 'w3m)
+(require 'wget nil t)
 
 
 ;;; Go to the next/previous link
@@ -61,29 +62,21 @@ Defined function has a name `utl-w3m-TYPE-url'."
 (utl-w3m-define-goto-url "next")
 (utl-w3m-define-goto-url "previous")
 
-
-;;; Download with wget
-
-(defvar utl-w3m-download-dir nil
-  "Default directory for downloading with wget.")
-
-;; from <http://www.emacswiki.org/emacs/WThreeMHintsAndTips>
-(defun utl-w3m-download-with-wget (dir)
-  "Download url at point to the directory DIR with wget."
-  (interactive
-   (list (ido-read-directory-name "Save to: " utl-w3m-download-dir)))
-  (let ((url (or (w3m-anchor) (w3m-image))))
-    (if url
-	(let ((proc (start-process "wget" (format "*wget %s*" url)
-				   "wget" "--passive-ftp" "-nv"
-				   "-P" (expand-file-name dir) url)))
-	  (set-process-sentinel proc
-                                (lambda (proc str)
-                                  (message "Download finished."))))
-      (message "Nothing to get."))))
+;;;###autoload (autoload 'utl-w3m-next-url "utl-w3m" nil t)
+;;;###autoload (autoload 'utl-w3m-previous-url "utl-w3m" nil t)
 
 
 
+;;;###autoload
+(defun utl-w3m-wget ()
+  "Download anchor, image, or current page.
+Same as `w3m-wget' but works."
+  (interactive)
+  (let ((url (or (w3m-anchor) (w3m-image)))
+        (wget-current-title w3m-current-title))
+    (wget-api url w3m-current-url)))
+
+;;;###autoload
 (defun utl-w3m-switch-to-buffer (arg)
   "Switch to a w3m buffer number ARG.
 Buffers are enumerated from 1."
