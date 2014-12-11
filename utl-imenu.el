@@ -5,10 +5,8 @@
 
 ;;; Code:
 
-(require 'imenu)
-
 
-;;; Sections
+;;; Lisp sections
 
 ;; If you have sections in lisp/elisp files that begin with ";;;", you
 ;; may use the following code to add "Sections" entry in `imenu':
@@ -28,17 +26,26 @@ If REGEXP is nil, use `utl-imenu-sections-re'."
    (list "Sections" (or regexp utl-imenu-sections-re) 1)
    t))
 
-;; To have "Sections" imenu entry (lines beginning with "///" in this
-;; example) in javascript buffers, I use the following:
-;;
-;; (add-hook 'js-mode-hook
-;;           (lambda ()
-;;             (utl-imenu-add-sections "^/// \\(.+\\)$")
-;;             (setq imenu-create-index-function 'utl-js-imenu-create-index)))
+
+;;; JS sections
 
-(declare-function js--imenu-create-index "js" nil)
+;; To have "Sections" entry in javascript buffers:
+;;
+;; (add-hook 'js-mode-hook 'utl-imenu-add-js-sections)
+
+(defvar utl-imenu-js-sections-re "^/// \\(.+\\)$"
+  "Regexp used for \"Sections\" imenu entries in `js-mode'.")
 
 ;;;###autoload
+(defun utl-imenu-add-js-sections (&optional regexp)
+  "Add REGEXP as a \"Sections\" element to `imenu-generic-expression'.
+If REGEXP is nil, use `utl-imenu-sections-re'."
+  (utl-imenu-add-sections utl-imenu-js-sections-re)
+  (setq-local imenu-create-index-function 'utl-js-imenu-create-index))
+
+(declare-function js--imenu-create-index "js" nil)
+(declare-function imenu--generic-function "imenu" (patterns))
+
 (defun utl-js-imenu-create-index ()
   "Create an index alist for the current js buffer.
 The function is suitable for `imenu-create-index-function'
