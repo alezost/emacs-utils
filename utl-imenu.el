@@ -17,13 +17,18 @@
 (defvar utl-imenu-sections-re "^;;; \\(.+\\)$"
   "Regexp used for \"Sections\" imenu entries.")
 
+(defvar utl-imenu-sections-group "Sections"
+  "Group name in imenu index of \"Sections\" entries.
+If nil, put the entries in a top level.  See MENU-TITLE in
+`imenu-generic-expression' variable for details.")
+
 ;;;###autoload
 (defun utl-imenu-add-sections (&optional regexp)
   "Add REGEXP as a \"Sections\" element to `imenu-generic-expression'.
 If REGEXP is nil, use `utl-imenu-sections-re'."
   (add-to-list
    'imenu-generic-expression
-   (list "Sections" (or regexp utl-imenu-sections-re) 1)
+   (list utl-imenu-sections-group (or regexp utl-imenu-sections-re) 1)
    t))
 
 
@@ -73,12 +78,17 @@ as the latter function and also create elements for
       (? ?\"))
   "Regexp used for `use-package' entries in imenu.")
 
+(defvar utl-imenu-use-package-group "use-package"
+  "Group name in imenu index of use-package entries.
+If nil, put the entries in a top level.  See MENU-TITLE in
+`imenu-generic-expression' variable for details.")
+
 ;;;###autoload
 (defun utl-imenu-add-use-package ()
   "Add `utl-imenu-use-package-re' to `imenu-generic-expression'."
   (add-to-list
    'imenu-generic-expression
-   (list nil utl-imenu-use-package-re 1)))
+   (list utl-imenu-use-package-group utl-imenu-use-package-re 1)))
 
 (provide 'utl-imenu)
 
