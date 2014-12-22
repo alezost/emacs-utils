@@ -17,7 +17,7 @@ Car of each assoc is a `major-mode'.  Cdr is a string or a
 function returning a string used for `mode-name'.")
 
 ;;;###autoload
-(defun utl-mode-name ()
+(defun utl-mode-name (&rest _)
   "Replace `mode-name' of the current major mode.
 Use the appropriate name from `utl-mode-names-alist'.
 This function is intended to be used in `after-change-major-mode-hook'."
