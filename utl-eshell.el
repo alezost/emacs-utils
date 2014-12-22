@@ -5,6 +5,10 @@
 
 ;;; Code:
 
+(require 'em-hist)
+(require 'em-dirs)
+(require 'em-unix)
+
 (defun utl-eshell-kill-whole-line (arg)
   "Similar to `kill-whole-line', but respect eshell prompt."
   (interactive "p")
@@ -21,6 +25,9 @@ ARG has the same meaning as in `eshell'"
   (let ((dir default-directory))
     (eshell arg)
     (eshell/cd dir)))
+
+(declare-function Info-find-node "info" t)
+(declare-function Info-menu "info" t)
 
 (defun utl-eshell/info (&rest args)
   "Run `info' command on NAME.
@@ -44,7 +51,8 @@ This function is intended to be used as a substitution for
 
 
 ;;; Eshell prompt
-;; idea from <http://www.emacswiki.org/emacs/EshellPrompt>
+
+;; Idea from <http://www.emacswiki.org/emacs/EshellPrompt>.
 
 ;; TODO improve regexp
 (defvar utl-eshell-prompt-regexp "^[#$] "
@@ -73,7 +81,7 @@ Similar to `eshell-previous-matching-input-from-input' but better."
   (interactive "p")
   (if (not (memq last-command '(utl-eshell-previous-matching-input-from-input
 				utl-eshell-next-matching-input-from-input)))
-      ;; Starting a new search
+      ;; Starting a new search.
       (setq eshell-matching-input-from-input-string
 	    (buffer-substring (save-excursion (eshell-bol) (point))
 			      (point))
