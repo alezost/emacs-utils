@@ -14,12 +14,12 @@
 (defvar utl-sound-file nil
   "Default sound file for `utl-play-sound'.")
 
-(defvar utl-sound-program "play"
+(defvar utl-sound-program (executable-find "play")
   "Default program for playing a sound.
 Used in `utl-play-sound'.
 If nil, use `play-sound-file'.")
 
-(defvar utl-sound-args '("-q")
+(defvar utl-sound-args (and utl-sound-program '("-q"))
   "List of default arguments for `utl-sound-program'.")
 
 (declare-function utl-start-process "utl-process" (program &rest args))
