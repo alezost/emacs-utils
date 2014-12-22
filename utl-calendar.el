@@ -21,17 +21,10 @@ of `calendar-date-display-form'."
     (diary-insert-entry arg event)))
 
 ;;;###autoload
-(defun utl-diary ()
-  "Visit `diary-file' or call `diary'."
+(defun utl-diary-file ()
+  "Visit `diary-file'."
   (interactive)
-  (if (diary-live-p)
-      (switch-to-buffer (find-buffer-visiting diary-file))
-    (diary)))
-
-(defadvice calendar-date-string
-    (before utl-yesdayname (date &optional abbreviate nodayname))
-  "Ignore NODAYNAME argument (always nil)."
-  (ad-set-arg 2 nil))
+  (find-file diary-file))
 
 (provide 'utl-calendar)
 
