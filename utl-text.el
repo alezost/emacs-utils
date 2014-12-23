@@ -116,13 +116,14 @@ If ARG is non-nil, prompt for a date."
 ;;;###autoload
 (defun utl-insert-clipboard ()
   "Insert the clipboard contents.
-It differs from `x-clipboard-yank' as it doesn't destroy what you
-paste with \\[yank]."
+It doesn't destroy what you paste with \\[yank]."
   (interactive)
-    (let ((clp (x-selection-value-internal 'CLIPBOARD)))
-      (if clp
-          (insert clp)
-        (message "Clipboard is empty."))))
+  (let ((clp (if (version< emacs-version "25")
+                 (x-selection-value-internal 'CLIPBOARD)
+               (gui--selection-value-internal 'CLIPBOARD))))
+    (if clp
+        (insert clp)
+      (message "Clipboard is empty."))))
 
 ;;;###autoload
 (defun utl-flush-blank-lines (start end)
