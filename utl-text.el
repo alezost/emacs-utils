@@ -90,77 +90,6 @@ the search from the beginning of the buffer if it did not succeed."
 	  (goto-char pos)
 	  nil))))
 
-(defun utl-search-in-buffer-for-matches (buffer re &optional count num reversep)
-  "Find COUNT unique strings matching regexp RE in buffer BUFFER.
-Return a list of strings matching the NUMth (0 by default)
-parenthesized expression in the regexp RE.
-If COUNT is nil or < 0, search in whole buffer (until search is failed).
-If REVERSEP is non-nil, return a reverted list."
-  (if (or (numberp count)
-          (and (null count) (setq count -1)))
-      (save-excursion
-        (with-current-buffer buffer
-          (goto-char (point-min))
-          (let ((i 0)
-                search-res search-list tmp)
-            (cl-loop do (setq search-res (re-search-forward re nil t))
-                     until (or (= i count) (null search-res))
-                     do
-                     (setq tmp search-list)
-                     (add-to-list 'search-list
-                                  (match-string-no-properties (or num 0))
-                                  t)
-                     (or (eq tmp search-list) (setq i (+ i 1))))
-            (if reversep
-                (nreverse search-list)
-              search-list))))
-    (error "Wrong value: count should be nil or a number")))
-
-(defun utl-search-in-url-for-matches (url re &optional count num reversep)
-  "Find COUNT unique strings matching regexp RE in url URL.
-Return a list of strings matching the NUMth (0 by default)
-parenthesized expression in the regexp RE.
-If COUNT is nil or < 0, search in whole webpage (until search is failed).
-If REVERSEP is non-nil, return a reverted list."
-  (utl-search-in-buffer-for-matches
-   (url-retrieve-synchronously url) re count num reversep))
-
-(defun utl-search-in-buffer-by-re-list (buffer re-list &optional num noerror)
-  "Find a string in buffer BUFFER by consecutive searching for
-regular expressions from a list RE-LIST.
-Return a string matching the NUMth (0 by default) parenthesized
-expression in the last regexp.
-If NOERROR is non-nil, just return nil if fail (no error)."
-  (save-excursion
-    (with-current-buffer buffer
-      (goto-char (point-min))
-      (let (result)
-        (dolist (re re-list result)
-          (setq result (re-search-forward re nil noerror)))
-        (and result (match-string-no-properties (or num 0)))))))
-
-(defun utl-search-in-url-by-re-list (url re-list &optional num noerror)
-  "Find a string in url URL by consecutive searching for
-regular expressions from a list RE-LIST.
-Return a string matching the NUMth (0 by default) parenthesized
-expression in the last regexp.
-If NOERROR is non-nil, just return nil if fail (no error)."
-  (utl-search-in-buffer-by-re-list
-   (url-retrieve-synchronously url) re-list num noerror))
-
-(defun utl-search-in-file-by-re-list (file re-list &optional num noerror)
-  "Find a string in file FILE by consecutive searching for
-regular expressions from a list RE-LIST.
-Return a string matching the NUMth (0 by default) parenthesized
-expression in the last regexp.
-If NOERROR is non-nil, just return nil if fail (no error)."
-  (or (file-regular-p file)
-      (error "Wrong file '%s'" file))
-  (with-temp-buffer
-    (insert-file-contents file)
-    (utl-search-in-buffer-by-re-list
-     (current-buffer) re-list num noerror)))
-
 
 ;;; Edit
 
