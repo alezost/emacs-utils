@@ -26,6 +26,7 @@
   (interactive
    (list (completing-read "IRC channel: " utl-irc-log-channels nil t)
          (org-read-date nil nil nil "Log date: ")))
+  (require 'url-expand)
   (browse-url (url-expand-file-name (concat channel "/" date)
                                     utl-irc-log-base-url)))
 
@@ -51,12 +52,11 @@ Conkeror."
   (interactive (browse-url-interactive-arg "URL: "))
   (setq url (browse-url-encode-url url))
   (let* ((process-environment (browse-url-process-environment)))
-    (apply 'start-process
+    (apply #'start-process
 	   (concat "conkeror " url) nil
 	   utl-browse-url-conkeror-program
-	   (append
-	    utl-browse-url-conkeror-arguments
-	    (list url)))))
+	   (append utl-browse-url-conkeror-arguments
+                   (list url)))))
 
 
 ;;; Choosing a browser
