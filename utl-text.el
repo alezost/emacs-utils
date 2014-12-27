@@ -535,9 +535,22 @@ move to end of next one."
 (defun utl-recenter-end-of-buffer-top ()
   "Move the last line (-1) of the buffer to the top of the window."
   (interactive)
-  (end-of-buffer)
+  (goto-char (point-max))
   (recenter-top-bottom 0)
-  (previous-line 2))
+  (forward-line -2))
+
+
+;;; Misc
+
+(defvar utl-check-parens-modes
+  '(emacs-lisp-mode lisp-mode scheme-mode)
+  "List of modes where `utl-check-parens' is called.")
+
+;;;###autoload
+(defun utl-check-parens ()
+  "Run `check-parens' if current mode is one of `utl-check-parens-modes'."
+  (when (memq major-mode utl-check-parens-modes)
+    (check-parens)))
 
 (provide 'utl-text)
 
