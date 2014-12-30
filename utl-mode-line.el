@@ -66,6 +66,7 @@ This function is intended to be used in hooks:
   "Part of mode line with additional info for the current major mode.")
 (put 'utl-mode-info 'risky-local-variable t)
 
+;;;###autoload
 (defun utl-mode-ibuffer-info ()
   "Set `utl-mode-info' to the additional info for `ibuffer-mode'.
 This function is intended to be added to `ibuffer-mode-hook'."
