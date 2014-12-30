@@ -5,24 +5,24 @@
 
 ;;; Code:
 
+(require 'dired)
 (require 'utl-process)
-(require 'utl-mode-line nil t)
 
 (defun utl-dired-start-process (program &optional args)
   "Open current file with a PROGRAM."
-  ;; shell command looks like this: "program [ARGS]... FILE" (ARGS can
-  ;; be nil, so remove it)
-  (apply 'utl-start-process
+  ;; Shell command looks like this: "program [ARGS]... FILE" (ARGS can
+  ;; be nil, so remove it).
+  (apply #'utl-start-process
          program
          (remove nil (list args (dired-get-file-for-visit)))))
 
 (defun utl-dired-start-process-on-marked-files (program &optional args)
   "Open marked files with a PROGRAM."
-  (apply 'utl-start-process
+  (apply #'utl-start-process
          program
          (remove nil (append args (dired-get-marked-files)))))
 
-;; moving to the first/last files - from <http://whattheemacsd.com/>
+;; Moving to the first/last files - from <http://whattheemacsd.com/>.
 (defun utl-dired-beginning-of-buffer ()
   "Move point to the first file."
   (interactive)
@@ -51,7 +51,7 @@ If ARG is non-nil, do not use human readable format (size in bytes)."
                        (if arg "b" "h")))
         (files (dired-get-marked-files)))
     (with-temp-buffer
-      (apply 'call-process "/usr/bin/du" nil t nil args files)
+      (apply #'call-process "du" nil t nil args files)
       (message "Size of all marked files: %s"
                (progn
                  (re-search-backward "\\(^.+\\)[[:blank:]]*total$")
@@ -65,11 +65,18 @@ With prefix (if ARG is non-nil), use the next ARG files instead."
    "stat" nil
    (dired-get-marked-files t arg)))
 
+(declare-function image-dired-backward-image
+                  "image-dired" (&optional arg))
+(declare-function image-dired-modify-mark-on-thumb-original-file
+                  "image-dired" (command))
+
 (defun utl-image-dired-unmark-thumb-original-file-backward ()
   "Move up and unmark original image file in associated dired buffer."
   (interactive)
   (image-dired-backward-image)
   (image-dired-modify-mark-on-thumb-original-file 'unmark))
+
+(defvar utl-mode-info)
 
 (defun utl-dired-sort-set-mode-line ()
   "Replacement for `dired-sort-set-mode-line'."
@@ -84,17 +91,8 @@ With prefix (if ARG is non-nil), use the next ARG files instead."
                    "date")
                   (t dired-actual-switches))))))
 
-(defadvice dired-sort-set-mode-line (around utl-new-mode-name)
-  "Add sorting name to `utl-mode-info' instead of `mode-name'."
-  (utl-dired-sort-set-mode-line))
-
-(defadvice wdired-change-to-dired-mode (after utl-mode-name)
-  "Use customized `mode-name' after exit from the `wdired-mode'."
-  ;; `mode-name' is hardcoded to \"Dired\" in
-  ;; `wdired-change-to-dired-mode' as well as in `dired-mode'.
-  (utl-mode-name))
-
-(defun utl-dired-mark-read-file-name (prompt dir op-symbol arg files &optional default)
+(defun utl-dired-mark-read-file-name (prompt dir op-symbol arg files
+                                             &optional default)
   "Replacement for `dired-mark-read-file-name'.
 Use default destination file in a prompt instead of a destination
 directory."
