@@ -36,6 +36,15 @@ Use `ido-completing-read' if possible."
                                require-match initial-input
                                hist def inherit-input-method))))
 
+(defun utl-ido-disable (fun &rest args)
+  "Disable `ido-completing-read' for FUN.
+This function is intended to be used as an 'around' advice for
+FUN, for example:
+
+  (advice-add 'org-set-tags :around #'utl-ido-disable)"
+  (let (utl-ido-enable-replace-completing-read)
+    (apply fun args)))
+
 
 (defvar ido-rotate-temp)
 
