@@ -22,9 +22,18 @@ ARG is passed to `eval-last-sexp'."
   (interactive "P")
   (if (use-region-p)
       (eval-region (region-beginning) (region-end))
+    (eval-last-sexp arg)))
+
+;;;###autoload
+(defun utl-pp-eval-dwim (arg)
+  "Eval last sexp or region if it is active.
+ARG is passed to `pp-eval-last-sexp'."
+  (interactive "P")
+  (if (use-region-p)
+      (eval-region (region-beginning) (region-end))
     (pp-eval-last-sexp arg)))
 
-;; from <http://www.emacswiki.org/emacs/ElDoc>
+;; From <http://www.emacswiki.org/emacs/ElDoc>.
 ;;;###autoload
 (defun utl-eldoc-argument-list (string)
   "Fontify STRING for use with `eldoc-mode'.
