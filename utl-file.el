@@ -24,7 +24,7 @@ If ARG is nil use `find-alternate-file', otherwise - `find-file'."
         (window-start (window-start))
         (point (point))
         (mark (and mark-active (region-beginning))))
-    (funcall (if arg 'find-file 'find-alternate-file)
+    (funcall (if arg #'find-file #'find-alternate-file)
              (format "/sudo::%s" file))
     (and mark (set-mark mark))
     (goto-char point)
@@ -73,7 +73,6 @@ with \\[universal-argument] \\[universal-argument] prompt for a default host as 
 ;; by `make-backup-file-name', but not by `find-backup-file-name', so
 ;; replace `make-backup-file-name-1' instead.
 
-;;;###autoload
 (defun utl-make-backup-file-name-1 (file)
   "Return a new backup file path of a given FILE.
 If the new path's directories do not exist, create them.
@@ -90,7 +89,7 @@ This function is intended to be used as a substitution for
     (if (null backup-directory)
         (setq backup-file file)
       (setq backup-file
-            ;; New full path in backup dir tree
+            ;; New full path in backup dir tree.
             (concat (directory-file-name (expand-file-name backup-directory))
                     file)
             abs-backup-directory (file-name-directory backup-file))
