@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(require 'org)
+
 (defun utl-xor (a b)
   "Exclusive or."
   (if a (not b) b))
@@ -24,7 +26,7 @@
                        're-search-backward
                      're-search-forward)))
     (when (looking-at org-any-link-re)
-      ;; Don't stay stuck at link without an org-link face
+      ;; Don't stay stuck at link without an org-link face.
       (forward-char (if search-backward -1 1)))
     (if (funcall srch-fun org-any-link-re nil t)
 	(progn
@@ -39,13 +41,6 @@
   "Go to the previous link."
   (interactive)
   (utl-next-link t))
-
-;;;###autoload
-(defun utl-apply (fun &rest args)
-  "Same as `apply', but check if a function is bound."
-  (if (fboundp fun)
-      (apply fun args)
-    (message "Function `%s' is unbound." fun)))
 
 (defun utl-read-string (prompt &optional initial-input history
                               default-value inherit-input-method)
@@ -77,7 +72,7 @@ With prefix, prompt for directory as well."
             (format "find %s -type f -name '*.[ch]' | etags -" dir)))))
   (eshell-command shell-cmd))
 
-;; idea from <http://www.emacswiki.org/emacs-en/DisabledCommands>
+;; Idea from <http://www.emacswiki.org/emacs-en/DisabledCommands>.
 ;;;###autoload
 (defun utl-show-disabled-commands ()
   "Show all disabled commands."
