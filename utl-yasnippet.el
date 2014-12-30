@@ -15,11 +15,12 @@
       (goto-char (overlay-start yas--active-field-overlay))
     (yas-expand)))
 
-(defadvice yas--on-protection-overlay-modification
-    (around utl-violate-fields-modification)
-  "Allow any editing during working with a snippet."
-  (let ((yas--inhibit-overlay-hooks t))
-    ad-do-it))
+;;;###autoload
+(defun utl-yas-exit-and-expand ()
+  "Exit all snippets and expand a snippet before point."
+  (interactive)
+  (save-excursion (yas-exit-all-snippets))
+  (yas-expand))
 
 (provide 'utl-yasnippet)
 
