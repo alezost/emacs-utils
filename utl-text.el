@@ -8,23 +8,6 @@
 (require 'cl-macs)
 
 
-;;; Thing at point
-;; add 'date symbol for dates in "2013-03-09"-like format
-
-(defvar utl-thing-at-point-date-regexp
-  "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}"
-    "A regular expression matching date value.")
-
-(put 'date 'bounds-of-thing-at-point
-     'utl-thing-at-point-bounds-of-date-at-point)
-
-(defun utl-thing-at-point-bounds-of-date-at-point ()
-  (save-excursion
-    (if (thing-at-point-looking-at utl-thing-at-point-date-regexp)
-        (cons (match-beginning 0) (match-end 0))
-      nil)))
-
-
 ;;; Pairs of symbols
 
 ;;;###autoload
