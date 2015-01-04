@@ -48,14 +48,14 @@ message for a case when FUN does not return a string."
   "Put a name of the current buffer into `kill-ring'."
   (interactive)
   (utl-funcall-to-kill-ring
-   'buffer-name "buffer-name has returned %s"))
+   #'buffer-name "buffer-name has returned %s"))
 
 ;;;###autoload
 (defun utl-file-name-to-kill-ring ()
   "Put a name of the file visited by the current buffer into `kill-ring'."
   (interactive)
   (utl-funcall-to-kill-ring
-   'buffer-file-name "buffer-file-name has returned %s"))
+   #'buffer-file-name "buffer-file-name has returned %s"))
 
 ;;;###autoload
 (defun utl-major-mode-to-kill-ring ()
@@ -104,6 +104,8 @@ If CHARSET is nil, use `unicode-bmp'.  With prefix, use `unicode-smp'."
   (utl-switch-to-buffer-or-funcall
    "*Packages*" #'list-packages))
 
+(declare-function w3m "w3m" t)
+
 ;;;###autoload
 (defun utl-switch-to-w3m ()
   "Switch to the `w3m' buffer."
@@ -114,6 +116,9 @@ If CHARSET is nil, use `unicode-bmp'.  With prefix, use `unicode-smp'."
          (w3m-alive-p)
        (error "w3m is not running")))
    #'w3m))
+
+(defvar aurel-list-buffer-name)
+(defvar aurel-info-buffer-name)
 
 ;;;###autoload
 (defun utl-switch-to-aurel-list ()
