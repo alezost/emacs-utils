@@ -7,6 +7,7 @@
 
 (require 'geiser-mode)
 
+;;;###autoload
 (defun utl-geiser-eval-dwim (arg)
   "Eval (with geiser) last sexp or region if it is active.
 ARG is passed to `geiser-eval-last-sexp'."
@@ -15,6 +16,7 @@ ARG is passed to `geiser-eval-last-sexp'."
       (geiser-eval-region (region-beginning) (region-end))
     (geiser-eval-last-sexp arg)))
 
+;;;###autoload
 (defun utl-geiser-repl-enter-dwim ()
   "Send input or goto the error at point.
 Substitution for `geiser-repl--maybe-send'."
@@ -26,12 +28,14 @@ Substitution for `geiser-repl--maybe-send'."
         (t
          (geiser-repl--send-input))))
 
+;;;###autoload
 (defun utl-geiser-repl-kill-whole-line (arg)
   "Similar to `kill-whole-line', but respect geiser repl prompt."
   (interactive "p")
   (kill-region (comint-line-beginning-position)
                (progn (forward-line arg) (point))))
 
+;;;###autoload
 (defun utl-geiser-doc-doc-symbol-at-point ()
   "Open documentation for symbol at point.
 This function refers to `geiser-doc-symbol-at-point' as
