@@ -83,6 +83,11 @@ With prefix, prompt for directory as well."
                   (prin1 symbol)
                   (princ "\n"))))))
 
+;;;###autoload
+(defun utl-refontify (&rest _)
+  "Refontify the current buffer."
+  (jit-lock-refontify))
+
 
 ;;; Spelling and languages
 
