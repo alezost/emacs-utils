@@ -58,6 +58,12 @@ FUN, for example:
   (setq ido-rotate-temp t)
   (exit-minibuffer))
 
+;;;###autoload
+(defun utl-ido-copy-current-item ()
+  "Put the current ido item into `kill-ring'."
+  (interactive)
+  (kill-new (car ido-matches)))
+
 (provide 'utl-ido)
 
 ;;; utl-ido.el ends here
