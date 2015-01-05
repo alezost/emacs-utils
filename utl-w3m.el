@@ -89,6 +89,13 @@ Buffers are enumerated from 1."
   (interactive "NSwitch to w3m buffer number: ")
   (utl-w3m-buffer-number-action #'switch-to-buffer arg))
 
+;;;###autoload
+(defun utl-w3m-kill-buffer (arg)
+  "Kill a w3m buffer number ARG.
+Buffers are enumerated from 1."
+  (interactive "NKill w3m buffer number: ")
+  (utl-w3m-buffer-number-action #'kill-buffer arg))
+
 (provide 'utl-w3m)
 
 ;;; utl-w3m.el ends here
