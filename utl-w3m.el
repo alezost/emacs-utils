@@ -76,13 +76,18 @@ Same as `w3m-wget' but works."
         (wget-current-title w3m-current-title))
     (wget-api url w3m-current-url)))
 
+(defun utl-w3m-buffer-number-action (function buffer-number)
+  "Call FUNCTION on a w3m buffer with BUFFER-NUMBER.
+Buffers are enumerated from 1."
+  (let ((buf (nth (- arg 1) (w3m-list-buffers))))
+    (and buf (funcall function buf))))
+
 ;;;###autoload
 (defun utl-w3m-switch-to-buffer (arg)
   "Switch to a w3m buffer number ARG.
 Buffers are enumerated from 1."
-  (interactive "NBuffer number: ")
-  (let ((buf (nth (- arg 1) (w3m-list-buffers))))
-    (and buf (switch-to-buffer buf))))
+  (interactive "NSwitch to w3m buffer number: ")
+  (utl-w3m-buffer-number-action #'switch-to-buffer arg))
 
 (provide 'utl-w3m)
 
