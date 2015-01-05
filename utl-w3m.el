@@ -96,6 +96,24 @@ Buffers are enumerated from 1."
   (interactive "NKill w3m buffer number: ")
   (utl-w3m-buffer-number-action #'kill-buffer arg))
 
+(defmacro utl-w3m-bind-number-keys (fun &optional kbd-prefix)
+  "Bind number keys (1-9) to a command that takes a numeric argument.
+For example to bind <N> keys for switching to w3m buffers (tabs)
+and to bind 'k <N>' keys for killing w3m buffers, use:
+
+  (utl-w3m-bind-number-keys utl-w3m-switch-to-buffer)
+  (utl-w3m-bind-number-keys utl-w3m-kill-buffer \"k\")
+
+To bind the keys, `bind-key' function is used."
+  (let ((numbers (number-sequence 1 9))
+        (prefix (and kbd-prefix (concat kbd-prefix " "))))
+    `(progn
+       ,@(mapcar (lambda (n)
+                   `(bind-key ,(concat prefix (number-to-string n))
+                              (lambda () (interactive) (,fun ,n))
+                              w3m-mode-map))
+                 numbers))))
+
 (provide 'utl-w3m)
 
 ;;; utl-w3m.el ends here
