@@ -8,17 +8,6 @@
 (require 'sql)
 (require 'cl-macs)
 
-;;;###autoload
-(defun utl-sql-connect (product database user)
-  "Connect to an SQL PRODUCT using DATABASE and USER.
-Do not prompt for anything else."
-  (let ((sql-database database)
-        (sql-user user)
-        (login-var (sql-get-product-feature
-                    product :sqli-login nil t)))
-    (cl-letf (((symbol-value login-var) nil))
-      (sql-product-interactive product))))
-
 
 ;;; Log of sql commands
 
@@ -45,21 +34,20 @@ Use `utl-sql-history-dir'."
 
 ;;; Mode line
 
+(defvar utl-mode-info)
+
 (defun utl-sql-highlight-product ()
-  "Replacement for `sql-highlight-product'."
+  "Add sql product name to `utl-mode-info' instead of `mode-name'.
+This function is intended to be used as a substitution for
+`sql-highlight-product'."
   (when (derived-mode-p 'sql-mode)
     (set-syntax-table (sql-product-syntax-table))
     (sql-product-font-lock nil t))
   (and (or (derived-mode-p 'sql-mode)
            (derived-mode-p 'sql-interactive-mode))
-       (require 'utl-mode-line nil t)
        (setq utl-mode-info
              (or (sql-get-product-feature sql-product :name)
                  (symbol-name sql-product)))))
-
-(defadvice sql-highlight-product (around utl-new-mode-name)
-  "Add sql product name to `utl-mode-info' instead of `mode-name'."
-  (utl-sql-highlight-product))
 
 (provide 'utl-sql)
 
