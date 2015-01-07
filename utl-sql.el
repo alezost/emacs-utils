@@ -7,6 +7,19 @@
 
 (require 'sql)
 (require 'cl-macs)
+(require 'auth-source)
+
+;;;###autoload
+(defun utl-sql-password-from-auth-source (host &optional user)
+  "Return sql password from authinfo file by HOST and USER.
+Return nil if credentials not found."
+  (let ((auth (car (auth-source-search :host host :user user))))
+    (when auth
+      (let* ((secret (plist-get auth :secret))
+             (password (if (functionp secret)
+                           (funcall secret)
+                         secret)))
+        (or password "")))))
 
 
 ;;; Log of sql commands
