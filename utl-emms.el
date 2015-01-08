@@ -46,6 +46,14 @@ With prefix, prompt for the number of seconds."
   (emms-stop)
   (emms-start))
 
+(defun utl-emms-first ()
+  "Start playing the first track in the EMMS playlist."
+  (interactive)
+  (when emms-player-playing-p
+    (emms-stop))
+  (emms-playlist-current-select-first)
+  (emms-start))
+
 
 ;;; Track description
 
