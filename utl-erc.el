@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'erc)
+(require 'erc-log)
 
 (defun utl-erc-server-buffer-name ()
   "Return a name of buffer with default server."
@@ -14,7 +15,7 @@
 
 (defun utl-erc-server-buffer-rename ()
   "Rename current server buffer (make a general name)."
-  ;; sometimes we need to modify names like "irc.freenode.net:7000<2>"
+  ;; Sometimes we need to modify names like "irc.freenode.net:7000<2>".
   (interactive)
   (let ((old-name (buffer-name))
         (new-name (utl-erc-server-buffer-name)))
@@ -30,14 +31,12 @@
   (switch-to-buffer (utl-erc-server-buffer-name)))
 
 ;;;###autoload
-(defun utl-erc-ido-switch-buffer ()
-  "Switch to ERC buffer, or start ERC if not already started.
-ERC buffer is selected using IDO."
+(defun utl-erc-switch-buffer ()
+  "Switch to ERC buffer, or start ERC if not already started."
   (interactive)
-  (let ((erc-bufs (mapcar (lambda (b) (buffer-name b))
-                          (erc-buffer-list))))
-    (if erc-bufs
-     	(switch-to-buffer (ido-completing-read "ERC buffer: " erc-bufs))
+  (let ((bufs (mapcar #'buffer-name (erc-buffer-list))))
+    (if bufs
+     	(switch-to-buffer (completing-read "ERC buffer: " bufs))
       (erc))))
 
 ;;;###autoload
@@ -45,17 +44,14 @@ ERC buffer is selected using IDO."
   "Same as `erc-track-switch-buffer', but start ERC if not already started."
   (interactive "p")
   (let ((server-buffer (utl-erc-server-buffer-name)))
-    (or (and (get-buffer server-buffer)
-             ;; (with-current-buffer server-buffer
-             ;;   (erc-server-process-alive))
-             (progn (erc-track-switch-buffer arg) t))
-        (let ((erc-join-buffer 'bury))
-          (erc)))))
+    (if (get-buffer server-buffer)
+        (erc-track-switch-buffer arg)
+      (erc))))
 
 (defun utl-erc-get-channel-buffer-list ()
   "Return a list of the ERC-channel-buffers."
   (erc-buffer-filter
-   '(lambda () (string-match "^#.*" (buffer-name (current-buffer))))))
+   (lambda () (string-match "^#.*" (buffer-name (current-buffer))))))
 
 ;;;###autoload
 (defun utl-erc-cycle ()
@@ -76,28 +72,25 @@ When called repeatedly, cycle through the buffers."
 
 (defun utl-erc-join-channel (channel &optional key)
   "Join CHANNEL.
-Similar to `erc-join-channel', but use IDO with `utl-erc-channel-list'."
+Similar to `erc-join-channel', but use `utl-erc-channel-list'."
   (interactive
    (list
     (let* ((cur-sexp (thing-at-point 'sexp))
            (chn (if (and cur-sexp
                          (eq 0 (string-match-p "#" cur-sexp)))
                     cur-sexp
-                  ;; "#"
-                  )))
-      (ido-completing-read "Join channel: " utl-erc-channel-list nil nil chn))
+                  "#")))
+      (completing-read "Join channel: " utl-erc-channel-list nil nil chn))
     (when (or current-prefix-arg erc-prompt-for-channel-key)
       (read-from-minibuffer "Channel key (RET for none): " nil))))
-  (with-current-buffer
-      (utl-erc-server-buffer-name)
+  (with-current-buffer (utl-erc-server-buffer-name)
     (erc-cmd-JOIN channel (when (>= (length key) 1) key))))
 
 (defun utl-erc-quit-server (reason)
   "Disconnect from current server.
 Similar to `erc-quit-server', but without prompting for REASON."
   (interactive (list ""))
-  (with-current-buffer
-      (utl-erc-server-buffer-name)
+  (with-current-buffer (utl-erc-server-buffer-name)
     (erc-cmd-QUIT reason)))
 
 (defun utl-erc-ghost-maybe (server nick)
@@ -147,17 +140,15 @@ Reasons are taken from `utl-erc-away-msg-list'."
   (interactive
    (list (if current-prefix-arg
              ""
-           (ido-completing-read "Reason for AWAY: "
-                                utl-erc-away-msg-list))))
-  (with-current-buffer
-      (utl-erc-server-buffer-name)
+           (completing-read "Reason for AWAY: "
+                            utl-erc-away-msg-list))))
+  (with-current-buffer (utl-erc-server-buffer-name)
     (erc-cmd-AWAY (or reason ""))))
 
 (defun utl-erc-away-time ()
   "Return non-nil if the current ERC process is set away.
 Similar to `erc-away-time', but no need to be in ERC buffer."
-  (with-current-buffer
-      (utl-erc-server-buffer-name)
+  (with-current-buffer (utl-erc-server-buffer-name)
     (erc-away-time)))
 
 
@@ -172,8 +163,8 @@ Similar to `erc-away-time', but no need to be in ERC buffer."
 (defun utl-erc-ctcp-query-ECHO (proc nick login host to msg)
   "Respond to a CTCP ECHO query."
   (when (string-match "^ECHO\\s-+\\(.*\\)\\s-*$" msg)
-    (let (;;(str (rot13 (match-string 1 msg)))
-          (str (apply 'string(reverse (string-to-list (match-string 1 msg))))))
+    (let ((str (apply #'string
+                      (reverse (string-to-list (match-string 1 msg))))))
       (unless erc-disable-ctcp-replies
 	(erc-send-ctcp-notice nick (format "ECHO Did you mean '%s'?" str)))))
   nil)
@@ -202,7 +193,7 @@ Similar to `erc-away-time', but no need to be in ERC buffer."
 ;;; Log
 
 (defun utl-erc-view-log-file ()
-  "Visit a log file for current ERC buffer."
+  "Visit a log file for the current ERC buffer."
   (interactive)
   (view-file (erc-current-logfile)))
 
@@ -215,7 +206,7 @@ This function is suitable for `erc-generate-log-file-name-function'."
            (file (concat (or (erc-network-name) server)
                          (and target (concat "_" target))
                          ".txt")))
-      ;; we need a make-safe-file-name function.
+      ;; We need a make-safe-file-name function.
       (convert-standard-filename file))))
 
 ;; If you want to exclude a particular channel "#foochannel" and
@@ -225,7 +216,7 @@ This function is suitable for `erc-generate-log-file-name-function'."
 ;; (setq erc-enable-logging 'utl-erc-log-all-but-some-buffers)
 ;;
 ;; Note: channel buffers may have names like "#foobar<2>", so too strict
-;; regexps like "\\`#foochannel\\'" may not be not good.
+;; regexps like "\\`#foochannel\\'" may be not good.
 
 (defvar utl-erc-log-excluded-regexps nil
   "List of regexps for erc buffer names that will not be logged.")
