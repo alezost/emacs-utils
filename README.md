@@ -18,10 +18,16 @@ Well, if you find something useful here, you probably know what to do:
 just copy a function you like to your `.emacs` (you will surely get rid
 of `utl-` prefix) and evaluate it to try it right now.
 
-And now I will tell how I use all these packages.
+Nowadays I use [quelpa](https://github.com/quelpa/quelpa) to install all
+the packages I use, including this `emacs-utils` package (my
+[emacs config is here](https://github.com/alezost/emacs-config/) if
+someone is interested).  Before that I used a manual method of
+generating autoloads and other stuff.  Here is what I used to do in the
+past:
 
 At first I added a directory with these files to `load-path`:
-```lisp
+
+```elisp
 (add-to-list 'load-path "/path/to/emacs-utils")
 ```
 
@@ -33,7 +39,7 @@ I do the following:
   generated `utils-autoloads.el` with `M-x update-directory-autoloads`
   and added
 
-  ```lisp
+  ```elisp
   (require 'utils-autoloads)
   ```
 
@@ -44,7 +50,7 @@ I do the following:
   don't have autoload cookies. For such files I add lines like the
   following to my `.emacs`:
 
-  ```lisp
+  ```elisp
   (eval-after-load 'gnus '(require 'utl-gnus))
   ```
 
