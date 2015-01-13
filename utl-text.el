@@ -8,55 +8,6 @@
 (require 'cl-macs)
 
 
-;;; Pairs of symbols
-
-;;;###autoload
-(defun utl-insert-curly-brackets (&optional arg)
-  "Similar to `insert-parentheses', except it inserts \{\}."
-  (interactive "P")
-  (insert-pair arg ?\{ ?\}))
-;;;###autoload
-(defun utl-insert-square-brackets (&optional arg)
-  "Similar to `insert-parentheses', except it inserts \[\]."
-  (interactive "P")
-  (insert-pair arg ?\[ ?\]))
-;;;###autoload
-(defun utl-insert-angle-brackets (&optional arg)
-  "Similar to `insert-parentheses', except it inserts <>."
-  (interactive "P")
-  (insert-pair arg ?\< ?\>))
-;;;###autoload
-(defun utl-insert-single-quotation (&optional arg)
-  "Similar to `insert-parentheses', except it inserts ''."
-  (interactive "P")
-  (insert-pair arg ?\' ?\'))
-;;;###autoload
-(defun utl-insert-left-right-single-quotation (&optional arg)
-  "Similar to `insert-parentheses', except it inserts ‘’."
-  (interactive "P")
-  (insert-pair arg ?\‘ ?\’))
-;;;###autoload
-(defun utl-insert-double-quotation (&optional arg)
-  "Similar to `insert-parentheses', except it inserts \"\"."
-  (interactive "P")
-  (insert-pair arg ?\" ?\"))
-;;;###autoload
-(defun utl-insert-left-right-double-quotation (&optional arg)
-  "Similar to `insert-parentheses', except it inserts “”."
-  (interactive "P")
-  (insert-pair arg ?\“ ?\”))
-;;;###autoload
-(defun utl-insert-grave-quotation (&optional arg)
-  "Similar to `insert-parentheses', except it inserts `'."
-  (interactive "P")
-  (insert-pair arg ?\` ?\'))
-;;;###autoload
-(defun utl-insert-angle-quotation (&optional arg)
-  "Similar to `insert-parentheses', except it inserts `'."
-  (interactive "P")
-  (insert-pair arg ?\« ?\»))
-
-
 ;;; Search and replace
 
 ;;;###autoload
