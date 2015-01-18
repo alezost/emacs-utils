@@ -21,6 +21,15 @@ Return nil if credentials not found."
                          secret)))
         (or password "")))))
 
+(declare-function sql-mysql-completion-init "sql-completion")
+
+(defun utl-sql-completion-setup ()
+  "Setup `sql-completion' for the current sql interaction buffer."
+  (and (require 'sql-completion nil t)
+       (eq major-mode 'sql-interactive-mode)
+       (eq sql-product 'mysql)
+       (sql-mysql-completion-init)))
+
 
 ;;; Log of sql commands
 
