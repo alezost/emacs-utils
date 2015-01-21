@@ -7,6 +7,8 @@
 
 (require 'emms)
 
+(defvar emms-playing-time-string)
+
 (defvar utl-emms-seek-seconds 60
   "The number of seconds to seek forward or backward.
 Used as a default value by `utl-emms-seek-forward' and
@@ -54,6 +56,13 @@ With prefix, prompt for the number of seconds."
   (emms-playlist-current-select-first)
   (emms-start))
 
+(defun utl-emms-playing-time-string (track)
+  "Return playing time of TRACK."
+  (let ((time (emms-track-get track 'info-playing-time)))
+    (if time
+        (format "%d:%02d" (/ time 60) (% time 60))
+      "")))
+
 
 ;;; Track description
 
@@ -96,6 +105,84 @@ Intended to be used for `emms-track-description-function'."
                          ": " (emms-track-name track))))))))
 
 
+;;; Notifications
+
+(require 'notifications)
+(require 'xml)
+
+(defvar utl-emms-notification-artist-format "%s")
+(defvar utl-emms-notification-title-format "%s")
+(defvar utl-emms-notification-album-format "%s")
+(defvar utl-emms-notification-year-format "%s")
+
+(defun utl-emms-notification-track-property (track property
+                                             &optional format-str)
+  "Return TRACK PROPERTY formatted with FORMAT-STR."
+  (let* ((val (emms-track-get track property))
+         (val (and (stringp val)
+                   (xml-escape-string val))))
+    (and val
+         (if format-str
+             (format format-str val)
+           val))))
+
+(defun utl-emms-notification-track-description (track)
+  "Return description of TRACK suitable for (dunst) notifications."
+  (let ((artist   (utl-emms-notification-track-property
+                   track 'info-artist
+                   utl-emms-notification-artist-format))
+        (title    (utl-emms-notification-track-property
+                   track 'info-title
+                   utl-emms-notification-title-format))
+        (tracknum (utl-emms-notification-track-property
+                   track 'info-tracknumber))
+        (album    (utl-emms-notification-track-property
+                   track 'info-album
+                   utl-emms-notification-album-format))
+        (year     (utl-emms-notification-track-property
+                   track 'info-year
+                   utl-emms-notification-year-format)))
+    (let* ((title (or title
+                      (emms-track-simple-description track)))
+           (title (if tracknum
+                      (format "%02d. %s"
+                              (string-to-number tracknum) title)
+                    title))
+           (album (cond ((and album year)
+                         (format "%s – %s" year album))
+                        (year  (format "%s" year))
+                        (album (format "%s" album)))))
+      (mapconcat #'identity
+                 (delq nil (list artist title album))
+                 "\n"))))
+
+;;;###autoload
+(defun utl-emms-notify ()
+  "Notify about the current track using `notifications-notify'."
+  (interactive)
+  (let ((track (emms-playlist-current-selected-track)))
+    (when track
+      (let ((status (if emms-player-playing-p
+                        (if emms-player-paused-p "⏸" "⏵")
+                      "⏹"))
+            (time (if (string= "" emms-playing-time-string)
+                      (utl-emms-playing-time-string track)
+                    emms-playing-time-string)))
+        (notifications-notify
+         :app-name "emms"
+         :title (format "%s %s" status time)
+         :body (utl-emms-notification-track-description track))))))
+
+;;;###autoload
+(define-minor-mode utl-emms-notification-mode
+  "Minor mode for EMMS notifications."
+  :global t
+  :init-value nil
+  (if utl-emms-notification-mode
+      (add-hook 'emms-player-started-hook 'utl-emms-notify)
+    (remove-hook 'emms-player-started-hook 'utl-emms-notify)))
+
+
 ;;; Mode line
 
 (require 'emms-mode-line)
@@ -114,7 +201,7 @@ Intended to be used for `emms-track-description-function'."
 
 ;;;###autoload
 (defun utl-emms-mode-line (arg)
-  "Turn on emms mode-line string if ARG is positive, off otherwise.
+  "Turn on EMMS mode-line string if ARG is positive, off otherwise.
 
 This is a substitution for `emms-mode-line' and `emms-playing-time'.
 
