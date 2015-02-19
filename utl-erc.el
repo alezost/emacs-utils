@@ -8,6 +8,11 @@
 (require 'erc)
 (require 'erc-log)
 
+(defun utl-znc-running-p ()
+  "Return non-nil if 'znc' daemon is running."
+  (string-match-p "\\`[[:digit:]]+ znc"
+                  (shell-command-to-string "pgrep -l znc")))
+
 (defun utl-erc-server-buffer-name ()
   "Return a name of buffer with default server."
   (concat (erc-compute-server) ":"
