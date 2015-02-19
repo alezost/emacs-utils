@@ -18,6 +18,15 @@
   (concat (erc-compute-server) ":"
            (number-to-string (erc-compute-port))))
 
+(defun utl-erc-server-buffer (&optional noerror)
+  "Return the current ERC server buffer.
+If NOERROR is non-nil, return nil instead of raising an error if
+the server buffer does not exist."
+  (or (erc-server-buffer)
+      (get-buffer (utl-erc-server-buffer-name))
+      (unless noerror
+        (error "No active ERC server buffer"))))
+
 (defun utl-erc-server-buffer-rename ()
   "Rename current server buffer (make a general name)."
   ;; Sometimes we need to modify names like "irc.freenode.net:7000<2>".
@@ -33,7 +42,7 @@
 (defun utl-erc-switch-to-server-buffer ()
   "Switch to ERC buffer with server."
   (interactive)
-  (switch-to-buffer (utl-erc-server-buffer-name)))
+  (switch-to-buffer (utl-erc-server-buffer)))
 
 ;;;###autoload
 (defun utl-erc-switch-buffer ()
@@ -48,8 +57,8 @@
 (defun utl-erc-track-switch-buffer (arg)
   "Same as `erc-track-switch-buffer', but start ERC if not already started."
   (interactive "p")
-  (let ((server-buffer (utl-erc-server-buffer-name)))
-    (if (get-buffer server-buffer)
+  (let ((buf (utl-erc-server-buffer t)))
+    (if buf
         (erc-track-switch-buffer arg)
       (erc))))
 
@@ -88,14 +97,14 @@ Similar to `erc-join-channel', but use `utl-erc-channel-list'."
       (completing-read "Join channel: " utl-erc-channel-list nil nil chn))
     (when (or current-prefix-arg erc-prompt-for-channel-key)
       (read-from-minibuffer "Channel key (RET for none): " nil))))
-  (with-current-buffer (utl-erc-server-buffer-name)
+  (with-current-buffer (utl-erc-server-buffer)
     (erc-cmd-JOIN channel (when (>= (length key) 1) key))))
 
 (defun utl-erc-quit-server (reason)
   "Disconnect from current server.
 Similar to `erc-quit-server', but without prompting for REASON."
   (interactive (list ""))
-  (with-current-buffer (utl-erc-server-buffer-name)
+  (with-current-buffer (utl-erc-server-buffer)
     (erc-cmd-QUIT reason)))
 
 (defun utl-erc-ghost-maybe (server nick)
@@ -147,13 +156,13 @@ Reasons are taken from `utl-erc-away-msg-list'."
              ""
            (completing-read "Reason for AWAY: "
                             utl-erc-away-msg-list))))
-  (with-current-buffer (utl-erc-server-buffer-name)
+  (with-current-buffer (utl-erc-server-buffer)
     (erc-cmd-AWAY (or reason ""))))
 
 (defun utl-erc-away-time ()
   "Return non-nil if the current ERC process is set away.
 Similar to `erc-away-time', but no need to be in ERC buffer."
-  (with-current-buffer (utl-erc-server-buffer-name)
+  (with-current-buffer (utl-erc-server-buffer)
     (erc-away-time)))
 
 
