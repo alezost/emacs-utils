@@ -191,7 +191,7 @@ Similar to `erc-away-time', but no need to be in ERC buffer."
   (unless erc-disable-ctcp-replies
     (erc-send-ctcp-notice
      nick
-     (format "VERSION %s." (erc-version))))
+     (format "VERSION ERC (GNU Emacs %s)" emacs-version)))
   nil)
 
 
