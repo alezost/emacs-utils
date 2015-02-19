@@ -6,6 +6,7 @@
 ;;; Code:
 
 (require 'dired)
+(require 'dired-x)
 (require 'utl-process)
 
 (defun utl-dired-start-process (program &optional args)
@@ -64,6 +65,20 @@ With prefix (if ARG is non-nil), use the next ARG files instead."
   (dired-do-shell-command
    "stat" nil
    (dired-get-marked-files t arg)))
+
+(defun utl-man-file-p (file)
+  "Return non-nil, if FILE is a Man-file."
+  ;; Is there a more reliable way?
+  (string-match-p (rx "." (any "0-8") (? ".gz") string-end)
+                  file))
+
+(defun utl-dired-man-or-chmod ()
+  "Perform `dired-man' on a Man-file or `dired-do-chmod' otherwise."
+  (interactive)
+  (let ((file (dired-get-filename)))
+    (if (utl-man-file-p file)
+        (dired-man)
+      (dired-do-chmod))))
 
 (declare-function image-dired-backward-image
                   "image-dired" (&optional arg))
