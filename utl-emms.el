@@ -56,12 +56,6 @@ With prefix, prompt for the number of seconds."
   (emms-playlist-current-select-first)
   (emms-start))
 
-(defun utl-emms-playing-time-string (track)
-  "Return playing time of TRACK."
-  (let ((time (emms-track-get track 'info-playing-time)))
-    (if time
-        (format "%d:%02d" (/ time 60) (% time 60))
-      "")))
 
 
 ;;; Track description
@@ -107,6 +101,7 @@ Intended to be used for `emms-track-description-function'."
 
 ;;; Notifications
 
+(require 'emms-status)
 (require 'notifications)
 (require 'xml)
 
@@ -162,15 +157,15 @@ Intended to be used for `emms-track-description-function'."
   (interactive)
   (let ((track (emms-playlist-current-selected-track)))
     (when track
-      (let ((status (if emms-player-playing-p
-                        (if emms-player-paused-p "⏸" "⏵")
-                      "⏹"))
-            (time (if (string= "" emms-playing-time-string)
-                      (utl-emms-playing-time-string track)
-                    emms-playing-time-string)))
+      (let ((state (emms-status-state))
+            (time (concat emms-status-current-playing-time
+                          (and emms-status-total-playing-time
+                               (concat " ("
+                                       emms-status-total-playing-time
+                                       ")")))))
         (notifications-notify
          :app-name "emms"
-         :title (format "%s %s" status time)
+         :title (format "%s  %s" state time)
          :body (utl-emms-notification-track-description track))))))
 
 ;;;###autoload
@@ -179,71 +174,11 @@ Intended to be used for `emms-track-description-function'."
   :global t
   :init-value nil
   (if utl-emms-notification-mode
-      (add-hook 'emms-player-started-hook 'utl-emms-notify)
+      (add-hook 'emms-player-started-hook 'utl-emms-notify t)
     (remove-hook 'emms-player-started-hook 'utl-emms-notify)))
 
 
 ;;; Mode line
-
-(require 'emms-mode-line)
-(require 'emms-playing-time)
-
-(defvar utl-emms-state-mode-line-string
-  '(emms-player-playing-p (emms-player-paused-p "⏸" "⏵") "⏹")
-  "Mode line string displaying the state of the current EMMS process.")
-
-(defvar utl-emms-mode-line-string
-  '(" " utl-emms-state-mode-line-string
-    (:propertize emms-playing-time-string face font-lock-constant-face)
-    emms-mode-line-string)
-  "Mode line string with the EMMS info.")
-(put 'utl-emms-mode-line-string 'risky-local-variable t)
-
-;;;###autoload
-(defun utl-emms-mode-line (arg)
-  "Turn on EMMS mode-line string if ARG is positive, off otherwise.
-
-This is a substitution for `emms-mode-line' and `emms-playing-time'.
-
-Use a single variable `utl-emms-mode-line-string' instead of
-adding `emms-mode-line-string' and `emms-playing-time-string' to
-the `global-mode-string'."
-  (interactive "p")
-  (or global-mode-string (setq global-mode-string '("")))
-  (let (hook-action activep)
-    (if (and arg (> arg 0))
-        (progn
-          (setq hook-action 'add-hook
-                activep t)
-          (when (and emms-mode-line-mode-line-function
-                     (not (memq 'utl-emms-mode-line-string global-mode-string)))
-            (setq global-mode-string
-                  (append global-mode-string
-                          '(utl-emms-mode-line-string))))
-          (when emms-player-playing-p (emms-mode-line-alter)))
-      (setq hook-action 'remove-hook
-            activep nil)
-      (emms-mode-line-restore-titlebar)
-      (emms-playing-time-stop)
-      (utl-emms-mode-line-restore-mode-line))
-    (setq emms-mode-line-active-p activep
-          emms-playing-time-p activep
-          emms-playing-time-display-p activep)
-    (funcall hook-action 'emms-track-updated-functions   'emms-mode-line-alter)
-    (funcall hook-action 'emms-player-started-hook       'emms-mode-line-alter)
-    (funcall hook-action 'emms-player-finished-hook      'emms-mode-line-blank)
-    (funcall hook-action 'emms-player-stopped-hook       'emms-mode-line-blank)
-    (funcall hook-action 'emms-player-started-hook       'emms-playing-time-start)
-    (funcall hook-action 'emms-player-stopped-hook       'emms-playing-time-stop)
-    (funcall hook-action 'emms-player-finished-hook      'emms-playing-time-stop)
-    (funcall hook-action 'emms-player-paused-hook        'emms-playing-time-pause)
-    (funcall hook-action 'emms-player-seeked-functions   'emms-playing-time-seek)
-    (funcall hook-action 'emms-player-time-set-functions 'emms-playing-time-set)))
-
-(defun utl-emms-mode-line-restore-mode-line ()
-  "Restore the mode-line."
-  (setq emms-mode-line-string nil
-        emms-playing-time-string nil))
 
 (defvar utl-emms-mode-line-song-function
   'utl-emms-short-track-description
