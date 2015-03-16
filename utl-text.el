@@ -122,20 +122,40 @@ With ARG, save that many lines."
                       (forward-visible-line arg)
                       (point)))))
 
+;; Some ideas came from
+;; <http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs/>.
 ;;;###autoload
-(defun utl-duplicate-line (arg)
-  "Duplicate current line.
-With ARG, do that many same lines.
-If ARG > 0, left the point on the last line, otherwise - on the first one."
-  (interactive "p")
-  (and (bolp) (forward-char))
-  (save-excursion
-    (utl-save-whole-line 1)
-    (beginning-of-line)
-    (and (< arg 0)
-         (forward-line))
-    (dotimes (i (abs arg))
-      (yank))))
+(defun utl-duplicate-dwim (&optional n)
+  "Duplicate current line, or region if it is active.
+Leave the point on the last copy.
+With argument N, make N copies.
+With negative N, comment everything except the last copy."
+  (interactive "*p")
+  (or n (setq n 1))
+  (let ((regionp (region-active-p)))
+    (cl-multiple-value-bind (beg end col)
+        (if regionp
+            (list (region-beginning)
+                  (region-end)
+                  nil)
+          (list (line-beginning-position)
+                (line-beginning-position 2)
+                (current-column)))
+      ;; Save the point for undo.
+      (setq buffer-undo-list
+            (cons (point) buffer-undo-list))
+      (let ((text (buffer-substring-no-properties beg end))
+            (buffer-undo-list t))       ; disable undo
+        (goto-char beg)
+        (dotimes (i (abs n))
+          (let ((beg (point)))
+            (insert text)
+            (when (< n 0)
+              (comment-region beg (point))))))
+      ;; Save bounds of the inserted region for undo.
+      (setq buffer-undo-list
+            (cons (cons beg (point)) buffer-undo-list))
+      (or regionp (move-to-column col)))))
 
 ;;;###autoload
 (defun utl-save-word (arg)
