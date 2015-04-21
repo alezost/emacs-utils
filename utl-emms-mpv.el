@@ -27,6 +27,21 @@ COMMAND is what may be put in mpv conf-file, e.g.: 'cycle mute',
   (interactive)
   (utl-emms-mpv-run-command "cycle fullscreen"))
 
+(defun utl-emms-mpv-sync-playing-time ()
+  "Synchronize `emms-playing-time' with the real time reported by mpv."
+  (interactive)
+  (emms-player-simple-mpv-tq-enqueue
+   '("get_property" "time-pos")
+   nil
+   (lambda (_ ans-ls)
+     (if (emms-player-simple-mpv-tq-success-p ans-ls)
+         (let ((sec (round (emms-player-simple-mpv-tq-assq-v
+                            'data ans-ls))))
+           (message "Old playing time: %d; new time: %d"
+                    emms-playing-time sec)
+           (setq emms-playing-time sec))
+       (message "mpv refuses to report about playing time")))))
+
 (provide 'utl-emms-mpv)
 
 ;;; utl-emms-mpv.el ends here
