@@ -42,6 +42,22 @@ COMMAND is what may be put in mpv conf-file, e.g.: 'cycle mute',
            (setq emms-playing-time sec))
        (message "mpv refuses to report about playing time")))))
 
+(defun utl-emms-mpv-add-simple-player ()
+  "Generate `emms-player-mpv' player."
+  (define-emms-simple-player-mpv mpv
+    '(file url streamlist playlist)
+    (concat "\\`\\(http\\|mms\\)://\\|"
+            (emms-player-simple-regexp
+             "ogg" "mp3" "wav" "mpg" "mpeg" "wmv" "wma"
+             "mov" "avi" "divx" "ogm" "ogv" "asf" "mkv"
+             "rm" "rmvb" "mp4" "flac" "vob" "m4a" "ape"
+             "flv" "webm"))
+    "mpv" "--no-terminal")
+  (emms-player-simple-mpv-add-to-converters
+   'emms-player-mpv "." '(playlist)
+   (lambda (track-name)
+     (format "--playlist=%s" track-name))))
+
 (provide 'utl-emms-mpv)
 
 ;;; utl-emms-mpv.el ends here
