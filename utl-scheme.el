@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(defvar calculate-lisp-indent-last-sexp)
+
 ;; The following code of `utl-scheme-indent-function' is taken from
 ;; <http://www.netris.org/~mhw/scheme-indent-function.el>.
 
