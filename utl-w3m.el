@@ -101,8 +101,8 @@ Buffers are enumerated from 1."
 For example to bind <N> keys for switching to w3m buffers (tabs)
 and to bind 'k <N>' keys for killing w3m buffers, use:
 
-  (utl-w3m-bind-number-keys utl-w3m-switch-to-buffer)
-  (utl-w3m-bind-number-keys utl-w3m-kill-buffer \"k\")
+  (utl-w3m-bind-number-keys 'utl-w3m-switch-to-buffer)
+  (utl-w3m-bind-number-keys 'utl-w3m-kill-buffer \"k\")
 
 To bind the keys, `bind-key' function is used."
   (let ((numbers (number-sequence 1 9))
@@ -110,7 +110,8 @@ To bind the keys, `bind-key' function is used."
     `(progn
        ,@(mapcar (lambda (n)
                    `(bind-key ,(concat prefix (number-to-string n))
-                              (lambda () (interactive) (,fun ,n))
+                              (lambda () (interactive)
+                                (funcall ,fun ,n))
                               w3m-mode-map))
                  numbers))))
 
