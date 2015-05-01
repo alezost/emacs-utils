@@ -5,7 +5,6 @@
 
 ;;; Code:
 
-(require 'em-hist)
 (require 'em-dirs)
 (require 'em-unix)
 
@@ -50,7 +49,7 @@ This function is intended to be used as a substitution for
       (Info-menu name))))
 
 
-;;; Eshell prompt
+;;; Prompt
 
 ;; Idea from <http://www.emacswiki.org/emacs/EshellPrompt>.
 
@@ -75,21 +74,29 @@ This function is intended to be used as a substitution for
           (utl-with-face (if (= (user-uid) 0) "#" "$")
                         'comint-highlight-prompt)))
 
+
+;;; History
+
+(require 'em-hist)
+
+;;;###autoload
 (defun utl-eshell-previous-matching-input-from-input (arg)
   "Search backwards through input history for match for current input.
-Similar to `eshell-previous-matching-input-from-input' but better."
+Unlike `eshell-previous-matching-input-from-input', the matching
+input is not forced to begin with the current input."
   (interactive "p")
-  (if (not (memq last-command '(utl-eshell-previous-matching-input-from-input
-				utl-eshell-next-matching-input-from-input)))
-      ;; Starting a new search.
-      (setq eshell-matching-input-from-input-string
-	    (buffer-substring (save-excursion (eshell-bol) (point))
-			      (point))
-	    eshell-history-index nil))
+  (unless (memq last-command '(utl-eshell-previous-matching-input-from-input
+                               utl-eshell-next-matching-input-from-input))
+    ;; Starting a new search.
+    (setq eshell-matching-input-from-input-string
+          (buffer-substring (save-excursion (eshell-bol) (point))
+                            (point))
+          eshell-history-index nil))
   (eshell-previous-matching-input
    (regexp-quote eshell-matching-input-from-input-string)
    arg))
 
+;;;###autoload
 (defun utl-eshell-next-matching-input-from-input (arg)
   "Search forwards through input history for match for current input."
   (interactive "p")
