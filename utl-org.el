@@ -95,24 +95,24 @@ row."
 
 ;;;###autoload
 (defun utl-org-emms-open (link)
-  "Open emms link LINK."
+  "Open emms LINK."
   (let ((path link)
         sec)
     (if (string-match "::\\([0-9]+\\)\\'" link)
         (setq sec (string-to-number (match-string 1 link))
               path (substring link 0 (match-beginning 0))))
     ;; Don't reload a track (just seek to time) if we want to open a
-    ;; link with currently played file and some specified time.
-    (unless (and (fboundp 'emms-track-name)
-                 (string= path
-                          (emms-track-name
-                           (emms-playlist-current-selected-track)))
-                 sec)
+    ;; link with the currently playing track.
+    (if (and (fboundp 'emms-track-name)
+             (string= path
+                      (emms-track-name
+                       (emms-playlist-current-selected-track))))
+        (emms-start)
       ;; TODO Use some emacs variable for matching url (there is
       ;; `ffap-url-regexp' but it can be modified by a user).
       (if (string-match "^\\(ftp\\|https?\\)://" path)
           (progn (emms-play-url path)
-                 ;; we need to wait while the backend will start to play
+                 ;; We need to wait while the backend will start to play.
                  (and sec (sleep-for utl-org-emms-url-sleep)))
         (emms-play-file path)
         (and sec (sleep-for utl-org-emms-file-sleep))))
@@ -137,9 +137,7 @@ The return value is a cons cell (link . description)."
       (error "Couldn't find a track"))
   (let ((path (emms-track-simple-description track))
         (desc (emms-info-track-description track))
-        (sec (and (equal track (emms-playlist-current-selected-track))
-                  (boundp 'emms-playing-time-p)
-                  emms-playing-time-p
+        (sec (and (bound-and-true-p emms-playing-time-p)
                   (/= 0 emms-playing-time)
                   emms-playing-time)))
     (cons (concat "emms:" path
