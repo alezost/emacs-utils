@@ -8,7 +8,7 @@
 (require 'pcomplete)
 
 (defvar utl-pcomplete-skipped-commands
-  '("sudo")
+  '("sudo" "xargs")
   "List of special commands for `utl-pcomplete-reduce-args-maybe'.")
 
 (defun utl-pcomplete-reduce-args-maybe (&rest _)
