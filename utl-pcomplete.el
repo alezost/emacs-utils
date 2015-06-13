@@ -17,9 +17,11 @@ If a command from `utl-pcomplete-skipped-commands' is being
 completed, skip it and perform completion as if the next argument
 was the current command."
   (when pcomplete-args
-    (let ((cmd (file-name-nondirectory (car pcomplete-args))))
-      (when (member cmd utl-pcomplete-skipped-commands)
-        (setq pcomplete-args (cdr pcomplete-args)
+    (let ((cmd (file-name-nondirectory (car pcomplete-args)))
+          (rest-args (cdr pcomplete-args)))
+      (when (and rest-args
+                 (member cmd utl-pcomplete-skipped-commands))
+        (setq pcomplete-args rest-args
               pcomplete-last (1- pcomplete-last))))))
 
 (defun utl-pcomplete-no-space ()
