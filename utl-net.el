@@ -40,6 +40,9 @@ This variable is passed to `format-time-string' with current time.")
 (defvar utl-router-log-url "http://192.168.1.1/cgi-bin/ExportSyslog.sh"
   "URL with router log.")
 
+(defvar url-handler-regexp)
+(declare-function syslog-mode "syslog-mode")
+
 ;;;###autoload
 (defun utl-router-get-log ()
   "Show a buffer with router log."
