@@ -22,7 +22,8 @@ was the current command."
       (when (and rest-args
                  (member cmd utl-pcomplete-skipped-commands))
         (setq pcomplete-args rest-args
-              pcomplete-last (1- pcomplete-last))))))
+              pcomplete-last (1- pcomplete-last))
+        (utl-pcomplete-reduce-args-maybe)))))
 
 (defun utl-pcomplete-no-space ()
   "Do not terminate a completion with space in the current buffer."
