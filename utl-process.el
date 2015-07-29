@@ -5,6 +5,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defun utl-start-process (program &rest args)
   "Same as `start-process', but don't bother about name and buffer."
   (let ((process-name (concat program "_process"))
@@ -26,6 +28,15 @@ Interactively prompt for PROCESS name."
                        "Kill process: "
                        (mapcar #'process-name (process-list))))))
   (delete-process process))
+
+(defun utl-process-is-program (args name)
+  "Return non-nil, if process defined by ARGS has program NAME."
+  (let ((prog (car args)))
+    (or (string= prog name)
+        (and (string-match-p "sh\\'" prog) ; if it is bash/sh/...
+             (string= (cl-second args) "-c")
+             (string-match-p (regexp-quote name)
+                             (cl-third args))))))
 
 
 ;; Hooks for starting/calling processes
