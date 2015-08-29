@@ -8,27 +8,16 @@
 
 ;;; Managing themes
 
-(defvar utl-current-theme nil
-  "Name of the current theme.")
-
 ;;;###autoload
 (defun utl-load-theme (theme)
-  "Similar to `load-theme' except unload the current theme at first."
+  "Similar to `load-theme' except it unloads the current themes at first."
   (interactive
    (list (intern (completing-read
                   "Load custom theme: "
                   (mapcar #'symbol-name (custom-available-themes))))))
-  (utl-unload-current-theme)
+  (mapc #'disable-theme custom-enabled-themes)
   (load-theme theme t)
-  (setq utl-current-theme theme)
-  (message "Current theme: '%S'." utl-current-theme))
-
-(defun utl-unload-current-theme ()
-  "Unload currently used theme."
-  (interactive)
-  (when utl-current-theme
-    (disable-theme utl-current-theme)
-    (setq utl-current-theme nil)))
+  (message "Current theme: '%S'." theme))
 
 ;; Idea from <https://gist.github.com/joehakimrahme/6305195>.
 ;;;###autoload
