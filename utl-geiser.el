@@ -49,6 +49,10 @@ This function refers to `geiser-doc-symbol-at-point' as
     (with--geiser-implementation impl
       (geiser-doc-symbol-at-point))))
 
+(defun utl-geiser-repl-buffer-name (impl)
+  "Return buffer name of Geiser REPL for IMPL."
+  (format "*%s*" (geiser-repl--repl-name impl)))
+
 (provide 'utl-geiser)
 
 ;;; utl-geiser.el ends here
