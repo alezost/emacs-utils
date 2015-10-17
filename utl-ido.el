@@ -26,7 +26,6 @@
 Use `ido-completing-read' if possible."
   (let (choices)
     (if (and utl-ido-enable-replace-completing-read
-             (not (eq ido-exit 'fallback))
              (setq choices (all-completions "" collection predicate)))
         ;; Match is never required because with requiring it's
         ;; not possible to select "#XXXXXX" with `read-color'.
