@@ -23,6 +23,15 @@ Use this function to compute SHA256 hash of the package source."
        (format "(guix-download (origin-uri (package-source %s)))"
                def)))))
 
+;;;###autoload
+(defun utl-guix-commit-url (commit)
+  "Put to `kill-ring' and browse guix git repo URL for COMMIT."
+  (interactive "sGuix commit: ")
+  (let ((url (concat "http://git.savannah.gnu.org/cgit/guix.git/commit/?id="
+                     commit)))
+    (kill-new url)
+    (browse-url url)))
+
 (provide 'utl-guix)
 
 ;;; utl-guix.el ends here
