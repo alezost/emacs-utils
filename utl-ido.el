@@ -48,10 +48,10 @@ FUN, for example:
 (defvar ido-rotate-temp)
 
 ;;;###autoload
-(defun utl-ido-home-work-directory ()
-  "Change to the home working directory."
+(defun utl-ido-set-current-directory (dir)
+  "Change the current ido working directory to DIR."
   (interactive)
-  (ido-set-current-directory "~")
+  (ido-set-current-directory dir)
   (setq ido-exit 'refresh)
   (setq ido-text-init ido-text)
   (setq ido-rotate-temp t)
