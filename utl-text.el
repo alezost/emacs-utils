@@ -8,7 +8,7 @@
 (require 'cl-macs)
 
 
-;;; Search and replace
+;;; Searching and replacing
 
 ;;;###autoload
 (defun utl-re-search-forward (regexp)
@@ -25,7 +25,7 @@ the search from the beginning of the buffer if it did not succeed."
 	  nil))))
 
 
-;;; Edit
+;;; Editing
 
 (defvar utl-delimiter
   "\f\n"
@@ -58,6 +58,27 @@ It doesn't destroy what you paste with \\[yank]."
     (if clp
         (insert clp)
       (message "Clipboard is empty."))))
+
+(defun utl-yank-or-pop (n)
+  "Replace just-yanked text with the N-th kill.
+If last command is not `yank', call `yank' N times."
+  (if (eq last-command 'yank)
+      (yank-pop n)
+    (dotimes (i (abs n)) (yank))))
+
+;;;###autoload
+(defun utl-yank-or-prev (arg)
+  "Replace just-yanked text with the previous kill.
+See `utl-yank-or-pop' for details."
+  (interactive "p")
+  (utl-yank-or-pop arg))
+
+;;;###autoload
+(defun utl-yank-or-next (arg)
+  "Replace just-yanked text with the next kill.
+See `utl-yank-or-pop' for details."
+  (interactive "p")
+  (utl-yank-or-pop (- arg)))
 
 ;;;###autoload
 (defun utl-flush-blank-lines (start end)
