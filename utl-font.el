@@ -38,14 +38,11 @@ Each specification from SPECS list has the following form:
 
 TARGETS is a list of characters TARGET.  See `set-fontset-font'
 for details."
-  (mapc (lambda (spec)
-          (let ((font    (car spec))
-                (targets (cdr spec)))
-            (mapc (lambda (target)
-                    (set-fontset-font name target font frame add))
-                  targets)))
-        specs))
-
+  (dolist (spec specs)
+    (pcase spec
+      (`(,font . ,targets)
+       (dolist (target targets)
+         (set-fontset-font name target font frame add))))))
 
 (provide 'utl-font)
 
