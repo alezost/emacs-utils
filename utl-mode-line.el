@@ -16,11 +16,6 @@
 Car of each assoc is a `major-mode'.  Cdr is a string or a
 function returning a string used for `mode-name'.")
 
-(defvar utl-minor-mode-names-alist nil
-  "Alist of minor mode names.
-Car of each assoc is a minor mode name.  Cdr is a string
-used by diminish to for `mode-name'.")
-
 ;;;###autoload
 (defun utl-mode-name (&rest _)
   "Replace `mode-name' of the current major mode.
@@ -46,14 +41,6 @@ to use the default value, call this function like this:
               (lambda ()
                 (setq mode-line-buffer-identification
                       (default-value 'mode-line-buffer-identification))))))
-
-(defun utl-diminish (alist)
-  "Diminish minor mode names from ALIST.
-ALIST should have a form of `utl-minor-mode-names-alist'."
-  (when (require 'diminish nil t)
-    (dolist (spec alist)
-      (diminish (car spec)
-                (concat " " (cdr spec))))))
 
 
 ;;; Mode line process
