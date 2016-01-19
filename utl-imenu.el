@@ -90,6 +90,28 @@ If nil, put the entries in a top level.  See MENU-TITLE in
    'imenu-generic-expression
    (list utl-imenu-use-package-group utl-imenu-use-package-re 1)))
 
+
+;;; (with-)eval-after-load entries
+
+(defvar utl-imenu-eval-after-load-re
+  (rx bol "(" (zero-or-one "with-") "eval-after-load" (+ whitespace)
+      (zero-or-one (or ?\" ?'))
+      (group (+ (or (syntax word) (syntax symbol))))
+      (zero-or-one ?\"))
+  "Regexp used for `eval-after-load' and `with-eval-after-load'
+entries in imenu.")
+
+(defvar utl-imenu-eval-after-load-group "(with-)eval-after-load")
+
+;;;###autoload
+(defun utl-imenu-add-eval-after-load ()
+  "Add `utl-imenu-eval-after-load-re' to `imenu-generic-expression'."
+  (add-to-list
+   'imenu-generic-expression
+   (list utl-imenu-eval-after-load-group
+         utl-imenu-eval-after-load-re
+         1)))
+
 (provide 'utl-imenu)
 
 ;;; utl-imenu.el ends here
