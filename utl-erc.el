@@ -8,6 +8,17 @@
 (require 'erc)
 (require 'erc-log)
 
+;;;###autoload
+(defun utl-erc-number-of-users ()
+  "Show a number of users on the current channel."
+  (interactive)
+  (let ((channel (erc-default-target)))
+    (if (and channel (erc-channel-p channel))
+        (message "The number of users on %s: %d"
+                 channel
+                 (hash-table-count erc-channel-users))
+      (user-error "The current buffer is not a channel"))))
+
 (defun utl-znc-running-p ()
   "Return non-nil if 'znc' daemon is running."
   (string-match-p "\\`[[:digit:]]+ znc"
