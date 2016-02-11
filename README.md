@@ -1,3 +1,8 @@
+This repository is **obsolete** and will not be updated anymore.  All
+these utils were merged into my main
+[emacs-config](https://github.com/alezost/emacs-config/) repository.
+
+
 ## About
 
 Some additional functions for GNU Emacs and various packages for it I
